@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours 1 — Conversions entières</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1e293b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--cyan:#06b6d4;--txt:#e2e8f0;--txt2:#94a3b8;--mono:'Fira Code','JetBrains Mono',monospace;--font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif}body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.8}a{color:var(--accent)}.header{background:var(--bg2);border-bottom:1px solid rgba(59,130,246,.15);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}.header .qlink{margin-left:auto;background:var(--accent);color:#fff;padding:6px 16px;border-radius:8px;font-size:.8rem;font-weight:700}.container{max-width:780px;margin:0 auto;padding:24px 20px 60px}h2{font-size:1.25rem;font-weight:700;color:var(--accent);margin:30px 0 12px;padding-bottom:6px;border-bottom:2px solid rgba(59,130,246,.2)}h2:first-child{margin-top:0}h3{font-size:1rem;font-weight:600;margin:18px 0 8px}p{margin:6px 0;color:var(--txt2)}code{background:var(--bg2);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.84rem;color:var(--cyan)}pre{background:var(--bg2);border:1px solid var(--bg3);border-radius:8px;padding:14px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.7;color:var(--cyan)}.warn{background:rgba(239,68,68,.08);border-left:3px solid var(--red);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.warn b{color:var(--red)}.tip{background:rgba(34,197,94,.08);border-left:3px solid var(--green);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.tip b{color:var(--green)}.info{background:rgba(59,130,246,.06);border-left:3px solid var(--accent);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem}th{background:var(--bg2);color:var(--accent);padding:8px 12px;text-align:left;border-bottom:2px solid var(--bg3)}td{padding:8px 12px;border-bottom:1px solid var(--bg3);color:var(--txt2)}.nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:16px;border-top:1px solid var(--bg3)}.nav a{padding:8px 16px;border:1px solid var(--bg3);border-radius:8px;font-size:.9rem}</style>
+</head>
+<body>
+<div class="header"><a href="index.html" class="back">←</a><h1>Cours 1 — Conversions entières</h1><a href="module1.html" class="qlink">→ Quiz (18q)</a></div>
+<div class="container">
+
+<h2>1. Numération positionnelle</h2>
+<pre>(dₙ dₙ₋₁ ... d₁ d₀)_B = dₙ×Bⁿ + dₙ₋₁×Bⁿ⁻¹ + ... + d₁×B + d₀</pre>
+<table><tr><th>Base</th><th>Nom</th><th>Chiffres</th></tr><tr><td>2</td><td>Binaire</td><td>0, 1</td></tr><tr><td>8</td><td>Octal</td><td>0–7</td></tr><tr><td>10</td><td>Décimal</td><td>0–9</td></tr><tr><td>16</td><td>Hexadécimal</td><td>0–9, A–F</td></tr></table>
+<div class="info"><b>Hexa :</b> A=10, B=11, C=12, D=13, E=14, F=15</div>
+
+<h2>2. Base B → Base 10</h2>
+<pre>(1AE)₁₆ = 1×256 + 10×16 + 14×1 = 430
+(1043)₅ = 1×125 + 0×25 + 4×5 + 3 = 148</pre>
+
+<h2>3. Base 10 → Base B</h2>
+<h3>Méthode de division</h3>
+<pre>225 en base 3 :
+225÷3=75 r0 | 75÷3=25 r0 | 25÷3=8 r1 | 8÷3=2 r2 | 2<3
+Lecture ↑ : (22100)₃</pre>
+<div class="tip"><b>✓</b> On s'arrête quand quotient < B.</div>
+
+<h3>Méthode de soustraction</h3>
+<pre>225 = 2×81 + 63 → 2
+ 63 = 2×27 + 9  → 2
+  9 = 1×9  + 0  → 1
+  0 = 0×3  + 0  → 0
+  0 = 0×1       → 0  ⇒ (22100)₃</pre>
+
+<h2>4. Binaire ↔ Octal ↔ Hex</h2>
+<p><b>8=2³</b> → groupes de 3 bits. <b>16=2⁴</b> → groupes de 4 bits.</p>
+<pre>Bin→Oct: (101 101)₂ = (55)₈
+Bin→Hex: (0010 1101)₂ = (2D)₁₆
+Oct→Hex: passer par le binaire !</pre>
+<div class="warn"><b>⚠</b> Entier: compléter à <b>gauche</b>. Fraction: compléter à <b>droite</b>.</div>
+
+<h2>5. Divisibilité en base B</h2>
+<pre>Terminer par k zéros = divisible par Bᵏ
+  (A145F00)₁₆ → div par 16² = 256
+Multiplier par B = ajouter un 0 à droite
+  16×(A145F00) = (A145F000)₁₆</pre>
+
+<nav class="nav"><a href="index.html">← Accueil</a><a href="courses2.html">Cours 2 →</a></nav>
+</div></body></html>

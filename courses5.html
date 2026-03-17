@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours 5 — Arithmétique modulaire</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1e293b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--cyan:#06b6d4;--txt:#e2e8f0;--txt2:#94a3b8;--font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif;--mono:'Fira Code','JetBrains Mono',monospace}body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.8}a{color:var(--accent)}.header{background:var(--bg2);border-bottom:1px solid rgba(59,130,246,.15);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}.header .qlink{margin-left:auto;background:var(--accent);color:#fff;padding:6px 16px;border-radius:8px;font-size:.8rem;font-weight:700}.container{max-width:780px;margin:0 auto;padding:24px 20px 60px}h2{font-size:1.25rem;font-weight:700;color:var(--accent);margin:30px 0 12px;padding-bottom:6px;border-bottom:2px solid rgba(59,130,246,.2)}h2:first-child{margin-top:0}h3{font-size:1rem;font-weight:600;margin:18px 0 8px}p{margin:6px 0;color:var(--txt2)}code{background:var(--bg2);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.84rem;color:var(--cyan)}pre{background:var(--bg2);border:1px solid var(--bg3);border-radius:8px;padding:14px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.7;color:var(--cyan)}.tip{background:rgba(34,197,94,.08);border-left:3px solid var(--green);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.tip b{color:var(--green)}.info{background:rgba(59,130,246,.06);border-left:3px solid var(--accent);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:16px;border-top:1px solid var(--bg3)}.nav a{padding:8px 16px;border:1px solid var(--bg3);border-radius:8px;font-size:.9rem}.nav a:hover{border-color:var(--accent);text-decoration:none}</style>
+</head>
+<body>
+<div class="header"><a href="index.html" class="back">←</a><h1>Cours 5 — Arithmétique modulaire</h1><a href="module5.html" class="qlink">→ Quiz</a></div>
+<div class="container">
+
+<h2>1. Congruences</h2>
+<p><b>a ≡ b (mod n)</b> signifie que n divise (a − b), ou de façon équivalente : a et b ont le même reste dans la division par n.</p>
+<pre>17 ≡ 2 (mod 5)     car 17 − 2 = 15 = 3×5
+−3 ≡ 4 (mod 7)     car −3 − 4 = −7 = (−1)×7</pre>
+
+<h2>2. Propriétés des congruences</h2>
+<p>Si a ≡ b (mod n) et c ≡ d (mod n), alors :</p>
+<pre>a + c ≡ b + d  (mod n)      — addition
+a × c ≡ b × d  (mod n)      — multiplication
+a^k   ≡ b^k    (mod n)      — puissance</pre>
+
+<div class="tip"><b>✓ Astuce :</b> On peut réduire modulo n <b>à chaque étape</b> d'un calcul. C'est ce qui rend les calculs gérables pour de grandes puissances.</div>
+
+<h2>3. Petit théorème de Fermat</h2>
+<p>Si <b>p est premier</b> et <b>p ne divise pas a</b>, alors :</p>
+<pre>a^(p−1) ≡ 1  (mod p)</pre>
+<p>Conséquence : a<sup>k</sup> mod p ne dépend que de k mod (p−1).</p>
+
+<pre>Exemple : Calculer 39^4 mod 4
+  39 ≡ 3 (mod 4)   [car 39 = 9×4 + 3]
+  39^4 ≡ 3^4 = 81 ≡ 1 (mod 4)   [car 81 = 20×4 + 1]</pre>
+
+<pre>Exemple : Montrer que x^12 − 1 est multiple de 7 pour x non multiple de 7
+  Par Fermat : x^6 ≡ 1 (mod 7)
+  Donc x^12 = (x^6)^2 ≡ 1^2 = 1 (mod 7)
+  Donc x^12 − 1 ≡ 0 (mod 7) ✓</pre>
+
+<h2>4. Calcul de 51<sup>4</sup> mod 4</h2>
+<pre>51 = 4×12 + 3, donc 51 ≡ 3 (mod 4)
+51^4 ≡ 3^4 (mod 4) = 81
+81 = 4×20 + 1, donc 81 ≡ 1 (mod 4)
+→ 51^4 ≡ 1 (mod 4)</pre>
+
+<h2>5. Divisibilité et bases</h2>
+<p>En base B, un nombre terminant par k zéros est divisible par B<sup>k</sup>.</p>
+<p>La somme des chiffres en base 10 donne le reste modulo 9 (critère de divisibilité par 9).</p>
+
+<div class="info"><b>ℹ Lien avec le CA2 :</b> Le complément à 2 fonctionne grâce à l'arithmétique modulo 2<sup>n</sup>. Sur 8 bits : tout se passe modulo 256.</div>
+
+<nav class="nav"><a href="courses4.html">← Cours 4</a><a href="index.html">Accueil →</a></nav>
+</div>
+</body>
+</html>

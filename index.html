@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Numération Logique — Révision CC1</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;--amber:#f59e0b;--cyan:#06b6d4;--green:#22c55e;--red:#ef4444;--purple:#a78bfa;--txt:#e6edf3;--txt2:#8b949e;--radius:12px;--body-font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif}
+body{background:var(--bg);color:var(--txt);font-family:var(--body-font);line-height:1.65;min-height:100vh}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+.hero{text-align:center;padding:48px 24px 32px}
+.hero h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--cyan),#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.hero .sub{color:var(--txt2);font-size:.95rem}.hero .sub b{color:var(--cyan)}
+.stats-bar{max-width:720px;margin:0 auto 32px;display:flex;justify-content:center;gap:24px;padding:16px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--bg3)}
+.stat{text-align:center}.stat .num{font-size:1.5rem;font-weight:800;color:var(--cyan)}.stat .num.g{color:var(--green)}.stat .num.r{color:var(--red)}.stat .num.p{color:var(--purple)}.stat .label{font-size:.72rem;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.global-prog{max-width:720px;margin:0 auto 40px;padding:0 20px}
+.global-prog-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}.global-prog-fill{height:100%;background:linear-gradient(90deg,var(--cyan),#22d3ee);border-radius:4px;transition:width .6s}
+.global-prog-text{text-align:center;font-size:.8rem;color:var(--txt2);margin-top:6px}.global-prog-text b{color:var(--cyan)}
+.grid{max-width:740px;margin:0 auto;padding:0 20px 40px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mod-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:20px;transition:.25s}
+.mod-card:hover{border-color:rgba(6,182,212,.35);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.mod-card .icon{font-size:1.6rem;margin-bottom:8px;display:block}.mod-card .title{font-size:.95rem;font-weight:700;margin-bottom:4px}.mod-card .tags{font-size:.7rem;color:var(--txt2);margin-bottom:12px}
+.mod-card .mini-bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden}.mod-card .mini-fill{height:100%;background:var(--cyan);border-radius:2px;transition:width .5s}
+.mod-card .mini-text{font-size:.7rem;color:var(--txt2);margin-top:6px;display:flex;justify-content:space-between}
+.mod-card .mini-text .right{color:var(--green)}.mod-card .mini-text .wrong{color:var(--red)}.mod-card .mini-text .errcnt{color:var(--purple)}
+.card-links{display:flex;gap:8px;margin-top:12px}
+.card-links a{flex:1;text-align:center;padding:7px 0;border-radius:6px;font-size:.8rem;font-weight:600;transition:.2s;text-decoration:none}
+.link-cours{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}.link-cours:hover{background:rgba(167,139,250,.2);text-decoration:none}
+.link-quiz{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.2)}.link-quiz:hover{background:rgba(6,182,212,.2);text-decoration:none}
+.reset-area{text-align:center;padding:20px 0 60px}
+.reset-btn{background:transparent;border:1px solid var(--red);color:var(--red);border-radius:8px;padding:8px 24px;font-size:.85rem;cursor:pointer;font-family:var(--body-font);font-weight:600;transition:.2s}.reset-btn:hover{background:rgba(239,68,68,.1)}
+@media(max-width:600px){.hero h1{font-size:1.5rem}.grid{grid-template-columns:1fr;padding:0 12px 40px}.stats-bar{flex-wrap:wrap;gap:16px;margin:0 12px 24px}}
+</style>
+</head>
+<body>
+<div class="hero"><h1>Numération Logique — Révision CC1</h1><div class="sub"><b>Université Paris Cité</b> — L1 · Basé sur CC1 2022-2025</div></div>
+<div class="stats-bar">
+  <div class="stat"><div class="num" id="totalQ">0</div><div class="label">Questions</div></div>
+  <div class="stat"><div class="num g" id="totalRight">0</div><div class="label">Correctes</div></div>
+  <div class="stat"><div class="num r" id="totalWrong">0</div><div class="label">Erreurs</div></div>
+  <div class="stat"><div class="num p" id="totalErrors">0</div><div class="label">Erreurs cumulées</div></div>
+  <div class="stat"><div class="num" id="totalPct">0%</div><div class="label">Progression</div></div>
+</div>
+<div class="global-prog"><div class="global-prog-bar"><div class="global-prog-fill" id="globalBar" style="width:0%"></div></div><div class="global-prog-text"><b id="globalDone">0</b> / <b id="globalTotal">0</b> questions complétées</div></div>
+<div class="grid" id="moduleGrid"></div>
+<div class="reset-area"><button class="reset-btn" onclick="resetAll()">🗑️ Réinitialiser toute la progression</button></div>
+<script>
+const modules=[
+  {id:1,icon:"🔢",title:"Conversions entières",tags:"base B→10 · 10→B · division · soustraction · 2↔8↔16",file:"module1-conversions-entieres.html",cours:"cours1-conversions-entieres.html",key:"nl_mod1_state",total:18},
+  {id:2,icon:"🔬",title:"Conversions fractionnaires",tags:"multiplication · soustraction · fini/infini · précision",file:"module2-conversions-fractionnaires.html",cours:"cours2-conversions-fractionnaires.html",key:"nl_mod2_state",total:15},
+  {id:3,icon:"⚡",title:"Complément à deux (CA2)",tags:"encodage · décodage · addition · overflow",file:"module3-complement-deux.html",cours:"cours3-complement-deux.html",key:"nl_mod3_state",total:16},
+  {id:4,icon:"💾",title:"Virgule flottante",tags:"normalisée · bit caché · biaisé · epsilon · range",file:"module4-virgule-flottante.html",cours:"cours4-virgule-flottante.html",key:"nl_mod4_state",total:15},
+  {id:5,icon:"🧮",title:"Modulo & divisibilité",tags:"congruences · Fermat · arithmétique modulaire",file:"module5-modulo.html",cours:"cours5-modulo.html",key:"nl_mod5_state",total:10}
+];
+function getS(k){try{const s=localStorage.getItem(k);if(s)return JSON.parse(s)}catch(e){}return{answered:{},right:0,wrong:0,errorCounts:{}}}
+function renderModules(){
+  const g=document.getElementById("moduleGrid");g.innerHTML="";
+  let gR=0,gW=0,gD=0,gT=0,gE=0;
+  modules.forEach(m=>{const st=getS(m.key);const done=Object.keys(st.answered).filter(k=>!k.includes("_")).length;const pct=m.total>0?Math.round(done/m.total*100):0;gR+=st.right;gW+=st.wrong;gD+=done;gT+=m.total;const ec=st.errorCounts||{};const te=Object.values(ec).reduce((a,b)=>a+b,0);gE+=te;
+    const c=document.createElement("div");c.className="mod-card";
+    c.innerHTML=`<span class="icon">${m.icon}</span><div class="title">Module ${m.id} — ${m.title}</div><div class="tags">${m.tags}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div><div class="mini-text"><span>${pct}%</span><span><span class="right">✓${st.right}</span> <span class="wrong">✗${st.wrong}</span> <span class="errcnt">⟳${te}</span></span></div><div class="card-links"><a href="${m.cours}" class="link-cours">📚 Cours</a><a href="${m.file}" class="link-quiz">🧠 Quiz</a></div>`;
+    g.appendChild(c)});
+  document.getElementById("totalRight").textContent=gR;document.getElementById("totalWrong").textContent=gW;document.getElementById("totalErrors").textContent=gE;
+  const gP=gT>0?Math.round(gD/gT*100):0;document.getElementById("totalPct").textContent=gP+"%";document.getElementById("totalQ").textContent=gT;document.getElementById("globalBar").style.width=gP+"%";document.getElementById("globalDone").textContent=gD;document.getElementById("globalTotal").textContent=gT;
+}
+function resetAll(){if(!confirm("Réinitialiser TOUTE la progression ?"))return;modules.forEach(m=>localStorage.removeItem(m.key));renderModules()}
+renderModules();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours 4 — Virgule flottante</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1e293b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--cyan:#06b6d4;--txt:#e2e8f0;--txt2:#94a3b8;--font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif;--mono:'Fira Code','JetBrains Mono',monospace}body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.8}a{color:var(--accent)}.header{background:var(--bg2);border-bottom:1px solid rgba(59,130,246,.15);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}.header .qlink{margin-left:auto;background:var(--accent);color:#fff;padding:6px 16px;border-radius:8px;font-size:.8rem;font-weight:700}.container{max-width:780px;margin:0 auto;padding:24px 20px 60px}h2{font-size:1.25rem;font-weight:700;color:var(--accent);margin:30px 0 12px;padding-bottom:6px;border-bottom:2px solid rgba(59,130,246,.2)}h2:first-child{margin-top:0}h3{font-size:1rem;font-weight:600;margin:18px 0 8px}p{margin:6px 0;color:var(--txt2)}code{background:var(--bg2);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.84rem;color:var(--cyan)}pre{background:var(--bg2);border:1px solid var(--bg3);border-radius:8px;padding:14px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.7;color:var(--cyan)}.warn{background:rgba(239,68,68,.08);border-left:3px solid var(--red);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.warn b{color:var(--red)}.tip{background:rgba(34,197,94,.08);border-left:3px solid var(--green);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.tip b{color:var(--green)}.info{background:rgba(59,130,246,.06);border-left:3px solid var(--accent);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem}th{background:var(--bg2);color:var(--accent);padding:8px 12px;text-align:left;border-bottom:2px solid var(--bg3)}td{padding:8px 12px;border-bottom:1px solid var(--bg3);color:var(--txt2)}.nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:16px;border-top:1px solid var(--bg3)}.nav a{padding:8px 16px;border:1px solid var(--bg3);border-radius:8px;font-size:.9rem}.nav a:hover{border-color:var(--accent);text-decoration:none}</style>
+</head>
+<body>
+<div class="header"><a href="index.html" class="back">←</a><h1>Cours 4 — Virgule flottante</h1><a href="module4.html" class="qlink">→ Quiz</a></div>
+<div class="container">
+
+<h2>1. Principe : nombre = ± mantisse × base^exposant</h2>
+<p>En virgule flottante normalisée, la mantisse commence par <b>0,d₁d₂...dₖ</b> avec <b>d₁ ≠ 0</b>.</p>
+
+<h3>Format 8 bits (exercice type) : B1 | B2B3B4 | B5B6B7B8</h3>
+<table>
+<tr><th>Champ</th><th>Bits</th><th>Rôle</th></tr>
+<tr><td>B1</td><td>1</td><td>Signe (0=+, 1=−)</td></tr>
+<tr><td>B2B3B4</td><td>3</td><td>Exposant</td></tr>
+<tr><td>B5B6B7B8</td><td>4</td><td>Mantisse</td></tr>
+</table>
+
+<h2>2. Version standard (exposant en CA2)</h2>
+<pre>Représenter +7,5 :
+  7,5 = (111,1)₂ = 0,1111 × 2³
+  Signe: 0
+  Exposant 3 en CA2 sur 3 bits: 011
+  Mantisse: 1111
+  → 0 011 1111</pre>
+
+<h2>3. Bit caché + exposant biaisé</h2>
+<p><b>Bit caché :</b> puisque d₁=1 toujours (normalisation), on ne le stocke pas. On gagne 1 bit de précision.</p>
+<p><b>Exposant biaisé :</b> au lieu du CA2, on ajoute un biais = 2<sup>k−1</sup> (k = nombre de bits d'exposant).</p>
+
+<pre>Représenter +7,5 avec bit caché et biais :
+  7,5 = 0,1111 × 2³
+  Signe: 0
+  Exposant: 3 + biais(2²=4) = 7 → (111)₂
+  Mantisse sans bit caché: 111 0 (on enlève le 1 initial, il reste 1110)
+  → 0 111 1110</pre>
+
+<div class="warn"><b>⚠ Décodage avec bit caché :</b> la mantisse stockée <code>B5B6B7B8</code> représente <code>0,1B5B6B7B8</code> (on remet le 1 devant).</div>
+
+<pre>Décoder 1 011 1000 (bit caché + biaisé) :
+  Signe: 1 → négatif
+  Exposant biaisé: (011)₂ = 3 → exposant réel = 3−4 = −1
+  Mantisse: 0,1 1000 (bit caché remis)
+  → −0,11 × 2⁻¹ = −(0,011)₂ = −0,375</pre>
+
+<h2>4. Registre base 10 : S s E M₁M₂M₃...</h2>
+<p>Format courant en exercice : S=signe, s=signe exposant, E=|exposant|, M=mantisse avec M₁≠0.</p>
+
+<pre>Registre 8 cases : S s E M₁M₂M₃M₄M₅
+Exemple : 0 1 3 56789 → +0,56789 × 10⁻³</pre>
+
+<h3>Bornes</h3>
+<pre>Plus petit positif : 0,10000 × 10⁻⁹   (M₁=1 min, exposant = −9)
+Plus grand positif : 0,99999 × 10⁹    (M max, exposant = +9)</pre>
+
+<h3>Nombre de valeurs représentables</h3>
+<pre>S: 2  ×  sE: 19 (−9 à +9)  ×  M₁: 9 (1 à 9)  ×  M₂...M₅: 10⁴
+= 2 × 19 × 9 × 10⁴ = 342 000</pre>
+
+<h2>5. Précision machine ε</h2>
+<p><b>ε</b> = plus petit nombre tel que <b>1 + ε ≠ 1</b> dans la représentation.</p>
+<pre>Registre S s E M₁M₂M₃M₄M₅ :
+  1 = 0,10000 × 10¹
+  Successeur = 0,10001 × 10¹
+  ε = 0,00001 × 10¹ = 10⁻⁴</pre>
+
+<div class="info"><b>ℹ Formule :</b> Pour une mantisse de k chiffres en base B : ε = B<sup>1−k</sup>. Ici B=10, k=5, donc ε = 10⁻⁴.</div>
+
+<h2>6. Pièges : overflow et perte de précision</h2>
+<pre>2 + 3 = 5 en flottants 3 bits mantisse base 2 :
+  2 = 0,100 × 2² ;  3 = 0,110 × 2²
+  Somme = 1,010 × 2² = 0,101 × 2³ → si exposant max = 2 : OVERFLOW</pre>
+
+<pre>Perte d'associativité :
+  a=−7, b=7, c=0.001 (registre 2 chiffres mantisse base 10)
+  (a+b)+c = 0 + 0,001 = 0,001 ✓
+  a+(b+c) = −7 + 7,001 → 7,001 arrondi à 7,0 → a+7,0 = 0 ✗</pre>
+
+<nav class="nav"><a href="courses3.html">← Cours 3</a><a href="courses5.html">Cours 5 : Modulo →</a></nav>
+</div>
+</body>
+</html>

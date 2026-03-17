@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours 3 — Complément à deux</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1e293b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--cyan:#06b6d4;--txt:#e2e8f0;--txt2:#94a3b8;--font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif;--mono:'Fira Code','JetBrains Mono',monospace}body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.8}a{color:var(--accent)}.header{background:var(--bg2);border-bottom:1px solid rgba(59,130,246,.15);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}.header .qlink{margin-left:auto;background:var(--accent);color:#fff;padding:6px 16px;border-radius:8px;font-size:.8rem;font-weight:700}.container{max-width:780px;margin:0 auto;padding:24px 20px 60px}h2{font-size:1.25rem;font-weight:700;color:var(--accent);margin:30px 0 12px;padding-bottom:6px;border-bottom:2px solid rgba(59,130,246,.2)}h2:first-child{margin-top:0}h3{font-size:1rem;font-weight:600;margin:18px 0 8px}p{margin:6px 0;color:var(--txt2)}code{background:var(--bg2);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.84rem;color:var(--cyan)}pre{background:var(--bg2);border:1px solid var(--bg3);border-radius:8px;padding:14px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.7;color:var(--cyan)}.warn{background:rgba(239,68,68,.08);border-left:3px solid var(--red);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.warn b{color:var(--red)}.tip{background:rgba(34,197,94,.08);border-left:3px solid var(--green);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.tip b{color:var(--green)}.info{background:rgba(59,130,246,.06);border-left:3px solid var(--accent);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem}th{background:var(--bg2);color:var(--accent);padding:8px 12px;text-align:left;border-bottom:2px solid var(--bg3)}td{padding:8px 12px;border-bottom:1px solid var(--bg3);color:var(--txt2)}.nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:16px;border-top:1px solid var(--bg3)}.nav a{padding:8px 16px;border:1px solid var(--bg3);border-radius:8px;font-size:.9rem}.nav a:hover{border-color:var(--accent);text-decoration:none}</style>
+</head>
+<body>
+<div class="header"><a href="index.html" class="back">←</a><h1>Cours 3 — Complément à deux (CA2)</h1><a href="module3.html" class="qlink">→ Quiz</a></div>
+<div class="container">
+<h2>1. Principe</h2>
+<p>Sur <b>n bits</b>, le CA2 représente les entiers de <b>−2<sup>n−1</sup></b> à <b>2<sup>n−1</sup>−1</b>. Sur 8 bits : −128 à +127.</p>
+<p>Le bit de poids fort (MSB) indique le signe : 0 = positif, 1 = négatif.</p>
+
+<h2>2. Coder un nombre positif</h2>
+<pre>+44 sur 8 bits : 44 = 32+8+4 → 0010 1100</pre>
+
+<h2>3. Coder un nombre négatif</h2>
+<pre>−63 sur 8 bits :
+  1. Coder +63 :     0011 1111
+  2. Inverser bits :  1100 0000
+  3. Ajouter 1 :     1100 0001  ← CA2(−63)</pre>
+<div class="tip"><b>✓ Vérification :</b> 0011 1111 + 1100 0001 = 1|0000 0000 (retenue ignorée = 0). C'est correct.</div>
+
+<h2>4. Décoder un CA2</h2>
+<pre>1001 1001 :
+  MSB=1 → négatif
+  Inverser: 0110 0110, +1: 0110 0111 = 103
+  → Nombre = −103</pre>
+
+<h2>5. Addition / Soustraction</h2>
+<p>A − B se calcule comme A + CA2(−B). On additionne normalement, on <b>ignore la retenue sortante</b>.</p>
+<pre>127 − 44 :
+  0111 1111    (+127)
++ 1101 0100    (−44)
+───────────
+1|0101 0011 → ignorer retenue → 0101 0011 = 83 ✓</pre>
+
+<h2>6. Overflow (dépassement)</h2>
+<div class="warn"><b>⚠ Règle :</b> Overflow ssi on additionne deux nombres de <b>même signe</b> et le résultat a un <b>signe différent</b>.<br>Équivalent : overflow ssi <b>bit de signe du résultat ≠ retenue vers le bit de signe</b>.</div>
+<pre>63 + 65 :     0011 1111 + 0100 0001 = 1000 0000
+  Deux positifs → résultat négatif → OVERFLOW !</pre>
+<pre>70 − 71 :     signes différents → JAMAIS d'overflow</pre>
+
+<div class="info"><b>ℹ Interprétation mathématique :</b> A − B se calcule comme A + (2<sup>n</sup> − B) − 2<sup>n</sup>. Le CA2(−B) = 2<sup>n</sup> − B, et la suppression de la retenue correspond au −2<sup>n</sup>.</div>
+
+<nav class="nav"><a href="courses2.html">← Cours 2</a><a href="courses4.html">Cours 4 : Flottants →</a></nav>
+</div>
+</body>
+</html>

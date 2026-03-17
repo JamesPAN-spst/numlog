@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cours 2 — Conversions fractionnaires</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0a0e17;--bg2:#111827;--bg3:#1e293b;--accent:#3b82f6;--green:#22c55e;--red:#ef4444;--cyan:#06b6d4;--txt:#e2e8f0;--txt2:#94a3b8;--mono:'Fira Code','JetBrains Mono',monospace;--font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif}body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.8}a{color:var(--accent)}.header{background:var(--bg2);border-bottom:1px solid rgba(59,130,246,.15);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}.header .qlink{margin-left:auto;background:var(--accent);color:#fff;padding:6px 16px;border-radius:8px;font-size:.8rem;font-weight:700}.container{max-width:780px;margin:0 auto;padding:24px 20px 60px}h2{font-size:1.25rem;font-weight:700;color:var(--accent);margin:30px 0 12px;padding-bottom:6px;border-bottom:2px solid rgba(59,130,246,.2)}h2:first-child{margin-top:0}h3{font-size:1rem;font-weight:600;margin:18px 0 8px}p{margin:6px 0;color:var(--txt2)}code{background:var(--bg2);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:.84rem;color:var(--cyan)}pre{background:var(--bg2);border:1px solid var(--bg3);border-radius:8px;padding:14px;margin:10px 0;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.7;color:var(--cyan)}.warn{background:rgba(239,68,68,.08);border-left:3px solid var(--red);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.warn b{color:var(--red)}.tip{background:rgba(34,197,94,.08);border-left:3px solid var(--green);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}.tip b{color:var(--green)}.info{background:rgba(59,130,246,.06);border-left:3px solid var(--accent);padding:10px 14px;margin:10px 0;font-size:.88rem;border-radius:0 8px 8px 0}table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.85rem}th{background:var(--bg2);color:var(--accent);padding:8px 12px;text-align:left;border-bottom:2px solid var(--bg3)}td{padding:8px 12px;border-bottom:1px solid var(--bg3);color:var(--txt2)}.nav{display:flex;justify-content:space-between;margin-top:36px;padding-top:16px;border-top:1px solid var(--bg3)}.nav a{padding:8px 16px;border:1px solid var(--bg3);border-radius:8px;font-size:.9rem}</style>
+</head>
+<body>
+<div class="header"><a href="index.html" class="back">←</a><h1>Cours 2 — Conversions fractionnaires</h1><a href="module2.html" class="qlink">→ Quiz</a></div>
+<div class="container">
+
+<h2>1. Base B → Base 10 (partie fractionnaire)</h2>
+<pre>(0,d₋₁ d₋₂ d₋₃)_B = d₋₁ × B⁻¹ + d₋₂ × B⁻² + d₋₃ × B⁻³
+
+(0,11)₂ = 1×0,5 + 1×0,25 = 0,75
+(11101,11)₂ = 29 + 0,75 = 29,75</pre>
+
+<h2>2. Méthode de la multiplication (10 → B)</h2>
+<p>Multiplier la partie fractionnaire par B. La partie entière du résultat = chiffre suivant.</p>
+<pre>(0,09)₁₀ en base 8 :
+0,09 × 8 = 0,72  → 0
+0,72 × 8 = 5,76  → 5
+0,76 × 8 = 6,08  → 6
+→ (0,056...)₈</pre>
+
+<h2>3. Méthode de la soustraction (10 → B)</h2>
+<pre>(0,8125)₁₀ en base 2 :
+0,8125 = 1×0,5   + 0,3125  → 1
+0,3125 = 1×0,25  + 0,0625  → 1
+0,0625 = 0×0,125 + 0,0625  → 0
+0,0625 = 1×0,0625           → 1
+→ (0,1101)₂</pre>
+
+<h2>4. Fini ou infini ?</h2>
+<div class="info"><b>Règle :</b> p/q (irréductible) a un développement <b>fini</b> en base B ⟺ tous les facteurs premiers de q divisent B.</div>
+
+<table>
+<tr><th>Nombre</th><th>Fraction</th><th>Base</th><th>Facteurs de q</th><th>Résultat</th></tr>
+<tr><td>0,8125</td><td>13/16</td><td>2</td><td>2⁴</td><td>Fini</td></tr>
+<tr><td>11,71</td><td>1171/100</td><td>2</td><td>2²×5²</td><td>Infini (5∤2)</td></tr>
+<tr><td>97,09</td><td>9709/100</td><td>8</td><td>2²×5²</td><td>Infini (5∤8)</td></tr>
+<tr><td>37,73</td><td>3773/100</td><td>3</td><td>2²×5²</td><td>Infini (2∤3)</td></tr>
+</table>
+
+<div class="warn"><b>⚠ Piège :</b> 0,8125 est fini en base 2, mais INFINI en base 3 (car 16 a le facteur 2 qui ne divise pas 3).</div>
+
+<h2>5. Nombre complet</h2>
+<p>Traiter partie entière (division) et fractionnaire (multiplication) séparément :</p>
+<pre>(97,09)₁₀ en base 8 :
+  97÷8=12 r1, 12÷8=1 r4 → (141)₈
+  0,09→multiplication → (0,056...)₈
+  → (141,056...)₈</pre>
+
+<nav class="nav"><a href="courses1.html">← Cours 1</a><a href="courses3.html">Cours 3 : CA2 →</a></nav>
+</div></body></html>
