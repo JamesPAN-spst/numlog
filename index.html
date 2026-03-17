@@ -47,11 +47,11 @@ a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
 <div class="reset-area"><button class="reset-btn" onclick="resetAll()">🗑️ Réinitialiser toute la progression</button></div>
 <script>
 const modules=[
-  {id:1,icon:"🔢",title:"Conversions entières",tags:"base B→10 · 10→B · division · soustraction · 2↔8↔16",file:"module1-conversions-entieres.html",cours:"cours1-conversions-entieres.html",key:"nl_mod1_state",total:18},
-  {id:2,icon:"🔬",title:"Conversions fractionnaires",tags:"multiplication · soustraction · fini/infini · précision",file:"module2-conversions-fractionnaires.html",cours:"cours2-conversions-fractionnaires.html",key:"nl_mod2_state",total:15},
-  {id:3,icon:"⚡",title:"Complément à deux (CA2)",tags:"encodage · décodage · addition · overflow",file:"module3-complement-deux.html",cours:"cours3-complement-deux.html",key:"nl_mod3_state",total:16},
-  {id:4,icon:"💾",title:"Virgule flottante",tags:"normalisée · bit caché · biaisé · epsilon · range",file:"module4-virgule-flottante.html",cours:"cours4-virgule-flottante.html",key:"nl_mod4_state",total:15},
-  {id:5,icon:"🧮",title:"Modulo & divisibilité",tags:"congruences · Fermat · arithmétique modulaire",file:"module5-modulo.html",cours:"cours5-modulo.html",key:"nl_mod5_state",total:10}
+  {id:1,icon:"🔢",title:"Conversions entières",tags:"base B→10 · 10→B · division · soustraction · 2↔8↔16",file:"module1.html",cours:"courses1.html",key:"nl_mod1_state",total:18},
+  {id:2,icon:"🔬",title:"Conversions fractionnaires",tags:"multiplication · soustraction · fini/infini · précision",file:"module2.html",cours:"courses2.html",key:"nl_mod2_state",total:15},
+  {id:3,icon:"⚡",title:"Complément à deux (CA2)",tags:"encodage · décodage · addition · overflow",file:"module3.html",cours:"courses3.html",key:"nl_mod3_state",total:16},
+  {id:4,icon:"💾",title:"Virgule flottante",tags:"normalisée · bit caché · biaisé · epsilon · range",file:"module4.html",cours:"courses4.html",key:"nl_mod4_state",total:15},
+  {id:5,icon:"🧮",title:"Modulo & divisibilité",tags:"congruences · Fermat · arithmétique modulaire",file:"module5.html",cours:"courses5.html",key:"nl_mod5_state",total:10}
 ];
 function getS(k){try{const s=localStorage.getItem(k);if(s)return JSON.parse(s)}catch(e){}return{answered:{},right:0,wrong:0,errorCounts:{}}}
 function renderModules(){
