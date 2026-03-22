@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M9 — Arbres de Beth & déduction | Quiz</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;--bg4:#2d333b;--accent:#06b6d4;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--purple:#a78bfa;--txt:#e6edf3;--txt2:#8b949e;--txt3:#484f58;--radius:10px;--font:-apple-system,'Segoe UI',sans-serif;--mono:'Fira Code',monospace}body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.65;min-height:100vh}a{color:var(--accent);text-decoration:none}
+.header{background:var(--bg2);border-bottom:1px solid var(--bg3);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);flex-wrap:wrap}.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}.badge{background:rgba(6,182,212,.1);color:var(--accent);font-size:.68rem;padding:3px 10px;border-radius:20px;font-weight:600}.cours-link{margin-left:auto;background:rgba(167,139,250,.12);color:var(--purple);padding:5px 14px;border-radius:7px;font-size:.78rem;font-weight:600;border:1px solid rgba(167,139,250,.2)}.score{display:flex;gap:10px;font-size:.82rem;color:var(--txt2);margin-left:12px}.score .g{color:var(--green);font-weight:700}.score .r{color:var(--red);font-weight:700}.score .o{color:var(--orange);font-weight:700}
+.container{max-width:860px;margin:0 auto;padding:20px 20px 80px}.qcard{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:20px;margin-bottom:16px;transition:border-color .3s}.qcard.correct{border-color:var(--green)}.qcard.wrong{border-color:var(--red)}.qhdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}.qnum{background:var(--bg3);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:6px}.qdiff{font-size:.65rem;padding:2px 8px;border-radius:4px;font-weight:600}.qdiff.easy{background:rgba(34,197,94,.1);color:var(--green)}.qdiff.medium{background:rgba(245,158,11,.1);color:var(--orange)}.qdiff.hard{background:rgba(239,68,68,.1);color:var(--red)}.qtext{font-size:.92rem;margin-bottom:14px;line-height:1.7}.qtext code{background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:.88em}
+.opts{display:flex;flex-direction:column;gap:8px}.opt{background:var(--bg);border:1px solid var(--bg3);border-radius:8px;padding:11px 16px;cursor:pointer;font-size:.88rem;transition:.2s;display:flex;align-items:center;gap:10px}.opt:hover:not(.locked){border-color:var(--accent)}.opt.c-right{border-color:var(--green);background:rgba(34,197,94,.08)}.opt.c-wrong{border-color:var(--red);background:rgba(239,68,68,.06)}.opt .marker{width:20px;height:20px;border-radius:50%;border:2px solid var(--txt3);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0}.opt.sel .marker{border-color:var(--accent);background:var(--accent);color:#fff}.opt.c-right .marker{border-color:var(--green);background:var(--green);color:#fff}.opt.c-wrong .marker{border-color:var(--red);background:var(--red);color:#fff}
+.input-row{display:flex;gap:8px}.input-row input{background:var(--bg);border:1px solid var(--bg3);color:var(--txt);padding:9px 14px;border-radius:8px;font-size:.9rem;font-family:var(--mono);flex:1;outline:none}.input-row input:focus{border-color:var(--accent)}.input-row input.c-right{border-color:var(--green)}.input-row input.c-wrong{border-color:var(--red)}.submit-btn{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--font)}.submit-btn:disabled{opacity:.4}
+.expl{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:.82rem;line-height:1.6;display:none}.expl.show{display:block}.expl.right{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);color:#a7f3d0}.expl.wrong{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#fca5a5}.errcnt{font-size:.7rem;color:var(--orange);margin-left:auto}.rstq{margin-top:8px;text-align:right}.rstq button{background:transparent;border:1px dashed var(--txt3);color:var(--txt2);border-radius:6px;padding:4px 10px;font-size:.72rem;cursor:pointer;font-family:var(--font)}.rstq button:hover{border-color:var(--accent);color:var(--accent)}
+.footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--bg3);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:100}.footer .pt{font-size:.82rem;color:var(--txt2)}.footer .pt b{color:var(--accent)}.pbar{flex:1;max-width:260px;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}.pfill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}.fbtn{background:transparent;border:1px solid var(--txt3);color:var(--txt2);border-radius:8px;padding:5px 14px;font-size:.78rem;cursor:pointer;font-family:var(--font);font-weight:600}.fbtn:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:600px){.header{padding:10px 14px;gap:8px}.container{padding:14px 10px 80px}}
+</style>
+</head>
+<body>
+<div class="header"><a href="index.html" class="back">←</a><h1>M9 — Arbres de Beth & déduction</h1><span class="badge">Beth · branches · consistance · ⊨</span><a href="cours9-arbres-beth.html" class="cours-link">📚 Cours</a><div class="score"><span>✓ <span class="g" id="sR">0</span></span><span>✗ <span class="r" id="sW">0</span></span><span>↻ <span class="o" id="sE">0</span></span></div></div>
+<div class="container"><div id="qc"></div></div>
+<div class="footer"><span class="pt"><b id="fp">0</b>/<b id="ft">14</b></span><div class="pbar"><div class="pfill" id="pb" style="width:0%"></div></div><button class="fbtn" onclick="resetAll()">🗑️ Reset</button></div>
+<script>
+const STATE_KEY="nl_mod9_state";
+const Q=[
+{id:1,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, la formule <code>A ∧ B</code> se décompose en :",
+ opts:["Deux branches : A à gauche, B à droite","Une seule branche : A puis B en dessous","On ne peut pas la décomposer","A ∨ B par De Morgan"],
+ answer:1,explanation:"Le ∧ (conjonction) est <b>non-branching</b> : si A∧B est vrai, alors A ET B sont vrais. On les ajoute sur la <b>même branche</b>, l'un sous l'autre."},
+
+{id:2,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, la formule <code>A ∨ B</code> se décompose en :",
+ opts:["Une seule branche : A puis B","Deux branches : A à gauche, B à droite","On inverse : ¬A ∧ ¬B","Trois branches : A, B, et A∧B"],
+ answer:1,explanation:"Le ∨ (disjonction) est <b>branching</b> : au moins l'un de A ou B est vrai. On crée <b>deux branches</b> séparées."},
+
+{id:3,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>A → B</code> dans un arbre de Beth ?",
+ opts:["Branche unique : A puis B","Deux branches : ¬A à gauche, B à droite","Deux branches : A à gauche, ¬B à droite","Branche unique : ¬A puis ¬B"],
+ answer:1,explanation:"A → B eq ¬A ∨ B. C'est une disjonction, donc <b>deux branches</b> : ¬A et B."},
+
+{id:4,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>¬(A → B)</code> ?",
+ opts:["Deux branches : A et ¬B","Branche unique : A puis ¬B","Branche unique : ¬A puis B","Deux branches : ¬A et B"],
+ answer:1,explanation:"¬(A→B) eq A ∧ ¬B. C'est une conjonction → <b>même branche</b> : A en haut, ¬B en dessous."},
+
+{id:5,type:"mcq",diff:"medium",text:"Une <b>branche fermée</b> dans un arbre de Beth est une branche qui :",
+ opts:["Ne contient que des atomes","Contient une variable p ET sa négation ¬p","A été complètement développée","Correspond à une tautologie"],
+ answer:1,explanation:"Une branche est <b>fermée</b> (marquée ✗) si elle contient à la fois une variable et sa négation. C'est contradictoire → cette branche ne peut pas satisfaire la formule."},
+
+{id:6,type:"mcq",diff:"medium",text:"Un <b>arbre fermé</b> (toutes les branches fermées) signifie que la formule d'origine est :",
+ opts:["Une tautologie","Satisfaisable","Insatisfaisable (contradiction)","Équivalente à ⊤"],
+ answer:2,explanation:"Si toutes les branches sont fermées, aucune distribution ne peut satisfaire la formule. Elle est <b>insatisfaisable</b>."},
+
+{id:7,type:"mcq",diff:"medium",text:"Pour montrer que F est une <b>tautologie</b> par arbre de Beth, on construit l'arbre de :",
+ opts:["F elle-même, et on vérifie que toutes les branches sont ouvertes","¬F, et on vérifie que l'arbre est fermé","F ∧ ¬F","F → F"],
+ answer:1,explanation:"Si l'arbre de ¬F est fermé → ¬F est insatisfaisable → F est toujours vraie → F est une <b>tautologie</b>."},
+
+{id:8,type:"mcq",diff:"medium",text:"La décomposition de <code>A ⟷ B</code> dans un arbre de Beth donne :",
+ opts:["Branche unique : A puis B","Deux branches : (A,B) à gauche et (¬A,¬B) à droite","Deux branches : A à gauche, B à droite","Quatre branches"],
+ answer:1,explanation:"A⟷B eq (A∧B) ∨ (¬A∧¬B). C'est un ∨ de deux conjonctions. Branche gauche : A puis B. Branche droite : ¬A puis ¬B."},
+
+{id:9,type:"mcq",diff:"medium",text:"Pour vérifier si ∑ = {H₁, H₂} permet de déduire C, on construit l'arbre de Beth de :",
+ opts:["H₁ ∧ H₂ ∧ C","H₁ ∧ H₂ ∧ ¬C","C → (H₁ ∧ H₂)","¬H₁ ∨ ¬H₂ ∨ C"],
+ answer:1,explanation:"On met les hypothèses et la <b>négation de la conclusion</b> dans le tronc : {H₁, H₂, ¬C}. Si l'arbre est fermé → ∑ ∪ {¬C} est inconsistant → la déduction est légitime."},
+
+{id:10,type:"mcq",diff:"medium",text:"Si l'arbre de Beth de ∑ ∪ {¬C} possède une branche ouverte, alors :",
+ opts:["La déduction ∑ ⊨ C est légitime","La déduction ∑ ⊨ C n'est PAS légitime","C est une tautologie","∑ est inconsistant"],
+ answer:1,explanation:"Branche ouverte → il existe une distribution satisfaisant ∑ et ¬C → on peut satisfaire les hypothèses sans que C soit vrai → la déduction <b>n'est pas légitime</b>."},
+
+{id:11,type:"mcq",diff:"hard",text:"Pour F = ((¬a∨b) ∧ c) → (a ∧ ¬b), l'arbre de Beth de F donne 3 branches. La FND simplifiée est :",
+ opts:["(a ∧ ¬b) ∨ ¬c","a ∧ ¬b ∧ ¬c","(¬a ∨ ¬b) ∧ ¬c","c → (a ∧ ¬b)"],
+ answer:0,explanation:"Les 3 branches donnent les atomes : branche 1 (a,¬b), branche 2 (¬c via ¬(¬a∨b)), branche 3 (a,¬b via a∧¬b). Deux branches identiques → FND = (a∧¬b) ∨ ¬c."},
+
+{id:12,type:"mcq",diff:"hard",text:"Si ∑ est <b>inconsistant</b>, alors pour toute formule C :",
+ opts:["∑ ⊨ C n'est jamais légitime","∑ ⊨ C est toujours légitime","Cela dépend de C","∑ ⊨ C seulement si C est une tautologie"],
+ answer:1,explanation:"D'un ensemble inconsistant, on peut déduire <b>n'importe quoi</b>. L'arbre de ∑ ∪ {¬C} sera toujours fermé puisque ∑ seul est déjà inconsistant."},
+
+{id:13,type:"mcq",diff:"hard",text:"Le théorème de la déduction dit que <code>∑ ∪ {H} ⊨ C</code> si et seulement si :",
+ opts:["∑ ⊨ C ∧ H","∑ ⊨ H → C","∑ ⊨ ¬H ∨ ¬C","H ⊨ ∑ → C"],
+ answer:1,explanation:"Théorème de la déduction : ∑ ∪ {H} ⊨ C <b>ssi</b> ∑ ⊨ (H → C). On peut « déplacer » une hypothèse dans l'implication de la conclusion."},
+
+{id:14,type:"mcq",diff:"hard",text:"Soit ∑ = {(p∧q)→r, r→s, q∧¬s}. Peut-on déduire C = ¬p ?",
+ opts:["Oui, car l'arbre de ∑ ∪ {p} est fermé","Non, il existe un contre-exemple","Non, ∑ est inconsistant","Oui, mais seulement si s=0"],
+ answer:0,explanation:"Non, on ne peut pas déduire ¬p. L'arbre de ∑ ∪ {p} (tronc : les hypothèses + p) possède une branche ouverte avec (p,q,r,s)=(0,1,0,0), donc la déduction n'est pas légitime. En fait l'arbre de ∑ ∪ {¬(¬p)} = ∑ ∪ {p} a une branche ouverte."}
+];
+let state;function loadState(){try{state=JSON.parse(localStorage.getItem(STATE_KEY))||{}}catch(e){state={}}if(!state.answered)state={answered:{},right:0,wrong:0,errorCounts:{}}}function saveState(){localStorage.setItem(STATE_KEY,JSON.stringify(state))}
+function render(){loadState();const c=document.getElementById("qc");c.innerHTML="";let done=0;Q.forEach((q)=>{const ans=state.answered[q.id];const isDone=ans!==undefined;if(isDone)done++;const ec=state.errorCounts[q.id]||0;const div=document.createElement("div");div.className="qcard"+(isDone?(ans===true?" correct":" wrong"):"");let inner=`<div class="qhdr"><span class="qnum">Q${q.id}</span><span class="qdiff ${q.diff}">${q.diff}</span>${ec>0?`<span class="errcnt">↻ ${ec}</span>`:""}</div><div class="qtext">${q.text}</div>`;if(q.type==="mcq"){inner+=`<div class="opts">`;q.opts.forEach((o,oi)=>{let cls="opt";if(isDone){cls+=" locked";if(oi===q.answer)cls+=" c-right";else if(ans===false&&state.answered[q.id+"_sel"]===oi)cls+=" c-wrong";}inner+=`<div class="${cls}" onclick="pickMCQ(${q.id},${oi})"><div class="marker">${isDone?(oi===q.answer?"✓":(state.answered[q.id+"_sel"]===oi?"✗":"")):"ABCD"[oi]}</div><span>${o}</span></div>`;});inner+="</div>";}else{const val=isDone?(state.answered[q.id+"_val"]||""):"";inner+=`<div class="input-row"><input id="inp${q.id}" value="${val}" placeholder="Réponse..." ${isDone?"disabled":""} class="${isDone?(ans?"c-right":"c-wrong"):""}" onkeydown="if(event.key==='Enter')submitInput(${q.id})"><button class="submit-btn" onclick="submitInput(${q.id})" ${isDone?"disabled":""}>Vérifier</button></div>`;}inner+=`<div class="expl ${isDone?"show":""} ${isDone?(ans?"right":"wrong"):""}">${isDone?(ans?"✅ Correct — ":"❌ Incorrect — ")+q.explanation:""}</div>`;if(isDone)inner+=`<div class="rstq"><button onclick="resetQ(${q.id})">↻ Refaire</button></div>`;div.innerHTML=inner;c.appendChild(div);});updateScore(done);}
+function pickMCQ(qid,oi){const q=Q.find(x=>x.id===qid);if(!q||state.answered[qid]!==undefined)return;const correct=oi===q.answer;state.answered[qid]=correct;state.answered[qid+"_sel"]=oi;if(correct)state.right++;else{state.wrong++;state.errorCounts[qid]=(state.errorCounts[qid]||0)+1;}saveState();render();}
+function submitInput(qid){const q=Q.find(x=>x.id===qid);if(!q||state.answered[qid]!==undefined)return;const inp=document.getElementById("inp"+qid);const val=inp.value.trim();if(!val)return;const correct=q.accept.some(a=>val.toLowerCase().replace(/\s/g,'')===a.toLowerCase().replace(/\s/g,''));state.answered[qid]=correct;state.answered[qid+"_val"]=val;if(correct)state.right++;else{state.wrong++;state.errorCounts[qid]=(state.errorCounts[qid]||0)+1;}saveState();render();}
+function resetQ(qid){delete state.answered[qid];delete state.answered[qid+"_sel"];delete state.answered[qid+"_val"];state.right=0;state.wrong=0;Q.forEach(qq=>{const a=state.answered[qq.id];if(a===true)state.right++;else if(a===false)state.wrong++;});saveState();render();}
+function resetAll(){if(!confirm("Réinitialiser ce module ?"))return;localStorage.removeItem(STATE_KEY);render();}
+function updateScore(done){document.getElementById("sR").textContent=state.right;document.getElementById("sW").textContent=state.wrong;const te=Object.values(state.errorCounts||{}).reduce((a,b)=>a+b,0);document.getElementById("sE").textContent=te;document.getElementById("fp").textContent=done;document.getElementById("pb").style.width=Math.round(done/Q.length*100)+"%";}
+render();
+</script>
+</body>
+</html>

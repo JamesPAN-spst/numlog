@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Numération Logique — Révision CC1</title>
+<title>Numération Logique — Révision CC1 + CC2</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;--amber:#f59e0b;--cyan:#06b6d4;--green:#22c55e;--red:#ef4444;--purple:#a78bfa;--txt:#e6edf3;--txt2:#8b949e;--radius:12px;--body-font:-apple-system,'Segoe UI','Noto Sans SC',sans-serif}
@@ -17,7 +17,9 @@ a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
 .global-prog{max-width:720px;margin:0 auto 40px;padding:0 20px}
 .global-prog-bar{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}.global-prog-fill{height:100%;background:linear-gradient(90deg,var(--cyan),#22d3ee);border-radius:4px;transition:width .6s}
 .global-prog-text{text-align:center;font-size:.8rem;color:var(--txt2);margin-top:6px}.global-prog-text b{color:var(--cyan)}
-.grid{max-width:740px;margin:0 auto;padding:0 20px 40px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.section-title{max-width:740px;margin:0 auto 16px;padding:0 20px;font-size:.85rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(245,158,11,.2)}
+.grid{max-width:740px;margin:0 auto;padding:0 20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .mod-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:20px;transition:.25s}
 .mod-card:hover{border-color:rgba(6,182,212,.35);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .mod-card .icon{font-size:1.6rem;margin-bottom:8px;display:block}.mod-card .title{font-size:.95rem;font-weight:700;margin-bottom:4px}.mod-card .tags{font-size:.7rem;color:var(--txt2);margin-bottom:12px}
@@ -34,7 +36,7 @@ a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
-<div class="hero"><h1>Numération Logique — Révision CC1</h1><div class="sub"><b>Université Paris Cité</b> — L1 · Basé sur CC1 2022-2025</div></div>
+<div class="hero"><h1>Numération Logique — Révision</h1><div class="sub"><b>Université Paris Cité</b> — L1 · CC1 + CC2</div></div>
 <div class="stats-bar">
   <div class="stat"><div class="num" id="totalQ">0</div><div class="label">Questions</div></div>
   <div class="stat"><div class="num g" id="totalRight">0</div><div class="label">Correctes</div></div>
@@ -43,24 +45,35 @@ a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
   <div class="stat"><div class="num" id="totalPct">0%</div><div class="label">Progression</div></div>
 </div>
 <div class="global-prog"><div class="global-prog-bar"><div class="global-prog-fill" id="globalBar" style="width:0%"></div></div><div class="global-prog-text"><b id="globalDone">0</b> / <b id="globalTotal">0</b> questions complétées</div></div>
-<div class="grid" id="moduleGrid"></div>
+
+<div class="section-title">CC1 — Numération</div>
+<div class="grid" id="moduleGrid1"></div>
+
+<div class="section-title">CC2 — Logique</div>
+<div class="grid" id="moduleGrid2"></div>
+
 <div class="reset-area"><button class="reset-btn" onclick="resetAll()">🗑️ Réinitialiser toute la progression</button></div>
 <script>
 const modules=[
-  {id:1,icon:"🔢",title:"Conversions entières",tags:"base B→10 · 10→B · division · soustraction · 2↔8↔16",file:"module1.html",cours:"courses1.html",key:"nl_mod1_state",total:18},
-  {id:2,icon:"🔬",title:"Conversions fractionnaires",tags:"multiplication · soustraction · fini/infini · précision",file:"module2.html",cours:"courses2.html",key:"nl_mod2_state",total:15},
-  {id:3,icon:"⚡",title:"Complément à deux (CA2)",tags:"encodage · décodage · addition · overflow",file:"module3.html",cours:"courses3.html",key:"nl_mod3_state",total:16},
-  {id:4,icon:"💾",title:"Virgule flottante",tags:"normalisée · bit caché · biaisé · epsilon · range",file:"module4.html",cours:"courses4.html",key:"nl_mod4_state",total:15},
-  {id:5,icon:"🧮",title:"Modulo & divisibilité",tags:"congruences · Fermat · arithmétique modulaire",file:"module5.html",cours:"courses5.html",key:"nl_mod5_state",total:10}
+  {id:1,icon:"🔢",title:"Conversions entières",tags:"base B→10 · 10→B · division · soustraction · 2↔8↔16",file:"module1-conversions-entieres.html",cours:"cours1-conversions-entieres.html",key:"nl_mod1_state",total:18,section:1},
+  {id:2,icon:"🔬",title:"Conversions fractionnaires",tags:"multiplication · soustraction · fini/infini · précision",file:"module2-conversions-fractionnaires.html",cours:"cours2-conversions-fractionnaires.html",key:"nl_mod2_state",total:15,section:1},
+  {id:3,icon:"⚡",title:"Complément à deux (CA2)",tags:"encodage · décodage · addition · overflow",file:"module3-complement-deux.html",cours:"cours3-complement-deux.html",key:"nl_mod3_state",total:16,section:1},
+  {id:4,icon:"💾",title:"Virgule flottante",tags:"normalisée · bit caché · biaisé · epsilon · range",file:"module4-virgule-flottante.html",cours:"cours4-virgule-flottante.html",key:"nl_mod4_state",total:15,section:1},
+  {id:5,icon:"🧮",title:"Modulo & divisibilité",tags:"congruences · Fermat · arithmétique modulaire",file:"module5-modulo.html",cours:"cours5-modulo.html",key:"nl_mod5_state",total:10,section:1},
+  {id:6,icon:"🧩",title:"Logique des propositions",tags:"connecteurs · tables de vérité · tautologie · De Morgan",file:"module6-logique-propositions.html",cours:"cours6-logique-propositions.html",key:"nl_mod6_state",total:15,section:2},
+  {id:7,icon:"📐",title:"Formes normales",tags:"FND · FNC · littéraux · table de vérité · simplification",file:"module7-formes-normales.html",cours:"cours7-formes-normales.html",key:"nl_mod7_state",total:14,section:2},
+  {id:8,icon:"⚙️",title:"Algèbre de Boole & Karnaugh",tags:"calcul booléen · mintermes · maxtermes · simplification",file:"module8-boole-karnaugh.html",cours:"cours8-boole-karnaugh.html",key:"nl_mod8_state",total:14,section:2},
+  {id:9,icon:"🌳",title:"Arbres de Beth & déduction",tags:"arbres de vérité · branches fermées · consistance · ⊨",file:"module9-arbres-beth.html",cours:"cours9-arbres-beth.html",key:"nl_mod9_state",total:14,section:2}
 ];
 function getS(k){try{const s=localStorage.getItem(k);if(s)return JSON.parse(s)}catch(e){}return{answered:{},right:0,wrong:0,errorCounts:{}}}
 function renderModules(){
-  const g=document.getElementById("moduleGrid");g.innerHTML="";
+  const g1=document.getElementById("moduleGrid1");g1.innerHTML="";
+  const g2=document.getElementById("moduleGrid2");g2.innerHTML="";
   let gR=0,gW=0,gD=0,gT=0,gE=0;
   modules.forEach(m=>{const st=getS(m.key);const done=Object.keys(st.answered).filter(k=>!k.includes("_")).length;const pct=m.total>0?Math.round(done/m.total*100):0;gR+=st.right;gW+=st.wrong;gD+=done;gT+=m.total;const ec=st.errorCounts||{};const te=Object.values(ec).reduce((a,b)=>a+b,0);gE+=te;
     const c=document.createElement("div");c.className="mod-card";
     c.innerHTML=`<span class="icon">${m.icon}</span><div class="title">Module ${m.id} — ${m.title}</div><div class="tags">${m.tags}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%"></div></div><div class="mini-text"><span>${pct}%</span><span><span class="right">✓${st.right}</span> <span class="wrong">✗${st.wrong}</span> <span class="errcnt">⟳${te}</span></span></div><div class="card-links"><a href="${m.cours}" class="link-cours">📚 Cours</a><a href="${m.file}" class="link-quiz">🧠 Quiz</a></div>`;
-    g.appendChild(c)});
+    if(m.section===1)g1.appendChild(c);else g2.appendChild(c)});
   document.getElementById("totalRight").textContent=gR;document.getElementById("totalWrong").textContent=gW;document.getElementById("totalErrors").textContent=gE;
   const gP=gT>0?Math.round(gD/gT*100):0;document.getElementById("totalPct").textContent=gP+"%";document.getElementById("totalQ").textContent=gT;document.getElementById("globalBar").style.width=gP+"%";document.getElementById("globalDone").textContent=gD;document.getElementById("globalTotal").textContent=gT;
 }

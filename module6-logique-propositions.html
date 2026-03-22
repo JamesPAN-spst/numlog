@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M6 — Logique des propositions | Quiz</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;--bg4:#2d333b;--accent:#06b6d4;--green:#22c55e;--red:#ef4444;--orange:#f59e0b;--purple:#a78bfa;--txt:#e6edf3;--txt2:#8b949e;--txt3:#484f58;--radius:10px;--font:-apple-system,'Segoe UI',sans-serif;--mono:'Fira Code',monospace}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);line-height:1.65;min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+.header{background:var(--bg2);border-bottom:1px solid var(--bg3);padding:14px 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);flex-wrap:wrap}
+.header .back{font-size:1.3rem;opacity:.7}.header h1{font-size:1.05rem;font-weight:600;color:var(--accent)}
+.badge{background:rgba(6,182,212,.1);color:var(--accent);font-size:.68rem;padding:3px 10px;border-radius:20px;font-weight:600}
+.cours-link{margin-left:auto;background:rgba(167,139,250,.12);color:var(--purple);padding:5px 14px;border-radius:7px;font-size:.78rem;font-weight:600;border:1px solid rgba(167,139,250,.2)}
+.score{display:flex;gap:10px;font-size:.82rem;color:var(--txt2);margin-left:12px}
+.score .g{color:var(--green);font-weight:700}.score .r{color:var(--red);font-weight:700}.score .o{color:var(--orange);font-weight:700}
+.container{max-width:860px;margin:0 auto;padding:20px 20px 80px}
+.qcard{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:20px;margin-bottom:16px;transition:border-color .3s}
+.qcard.correct{border-color:var(--green)}.qcard.wrong{border-color:var(--red)}
+.qhdr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.qnum{background:var(--bg3);color:var(--accent);font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:6px}
+.qdiff{font-size:.65rem;padding:2px 8px;border-radius:4px;font-weight:600}
+.qdiff.easy{background:rgba(34,197,94,.1);color:var(--green)}.qdiff.medium{background:rgba(245,158,11,.1);color:var(--orange)}.qdiff.hard{background:rgba(239,68,68,.1);color:var(--red)}
+.qtext{font-size:.92rem;margin-bottom:14px;line-height:1.7}
+.qtext code{background:var(--bg3);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:.88em}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{background:var(--bg);border:1px solid var(--bg3);border-radius:8px;padding:11px 16px;cursor:pointer;font-size:.88rem;transition:.2s;display:flex;align-items:center;gap:10px}
+.opt:hover:not(.locked){border-color:var(--accent);background:rgba(6,182,212,.04)}
+.opt.sel{border-color:var(--accent);background:rgba(6,182,212,.08)}
+.opt.c-right{border-color:var(--green);background:rgba(34,197,94,.08)}.opt.c-wrong{border-color:var(--red);background:rgba(239,68,68,.06)}
+.opt .marker{width:20px;height:20px;border-radius:50%;border:2px solid var(--txt3);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;transition:.2s}
+.opt.sel .marker{border-color:var(--accent);background:var(--accent);color:#fff}
+.opt.c-right .marker{border-color:var(--green);background:var(--green);color:#fff}
+.opt.c-wrong .marker{border-color:var(--red);background:var(--red);color:#fff}
+.input-row{display:flex;gap:8px;align-items:center}
+.input-row input{background:var(--bg);border:1px solid var(--bg3);color:var(--txt);padding:9px 14px;border-radius:8px;font-size:.9rem;font-family:var(--mono);flex:1;outline:none;transition:.2s}
+.input-row input:focus{border-color:var(--accent)}
+.input-row input.c-right{border-color:var(--green)}.input-row input.c-wrong{border-color:var(--red)}
+.submit-btn{background:var(--accent);color:#fff;border:none;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:.2s}
+.submit-btn:hover{filter:brightness(1.15)}.submit-btn:disabled{opacity:.4;cursor:default}
+.expl{margin-top:12px;padding:12px 16px;border-radius:8px;font-size:.82rem;line-height:1.6;display:none}
+.expl.show{display:block}
+.expl.right{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.15);color:#a7f3d0}
+.expl.wrong{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);color:#fca5a5}
+.errcnt{font-size:.7rem;color:var(--orange);margin-left:auto}
+.rstq{margin-top:8px;text-align:right}.rstq button{background:transparent;border:1px dashed var(--txt3);color:var(--txt2);border-radius:6px;padding:4px 10px;font-size:.72rem;cursor:pointer;font-family:var(--font)}.rstq button:hover{border-color:var(--accent);color:var(--accent)}
+.footer{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--bg3);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:16px;z-index:100}
+.footer .pt{font-size:.82rem;color:var(--txt2)}.footer .pt b{color:var(--accent)}
+.pbar{flex:1;max-width:260px;height:5px;background:var(--bg);border-radius:3px;overflow:hidden}.pfill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.fbtn{background:transparent;border:1px solid var(--txt3);color:var(--txt2);border-radius:8px;padding:5px 14px;font-size:.78rem;cursor:pointer;font-family:var(--font);font-weight:600}.fbtn:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:600px){.header{padding:10px 14px;gap:8px}.container{padding:14px 10px 80px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <a href="index.html" class="back">←</a>
+  <h1>M6 — Logique des propositions</h1>
+  <span class="badge">connecteurs · vérité · tautologie</span>
+  <a href="cours6-logique-propositions.html" class="cours-link">📚 Cours</a>
+  <div class="score"><span>✓ <span class="g" id="sR">0</span></span><span>✗ <span class="r" id="sW">0</span></span><span>↻ <span class="o" id="sE">0</span></span></div>
+</div>
+<div class="container"><div id="qc"></div></div>
+<div class="footer">
+  <span class="pt"><b id="fp">0</b>/<b id="ft">15</b></span>
+  <div class="pbar"><div class="pfill" id="pb" style="width:0%"></div></div>
+  <button class="fbtn" onclick="resetAll()">🗑️ Reset</button>
+</div>
+<script>
+const STATE_KEY="nl_mod6_state";
+const Q=[
+{id:1,type:"mcq",diff:"easy",text:"Parmi ces phrases, laquelle est une <b>proposition</b> au sens logique ?",
+ opts:["« Quelle heure est-il ? »","« Assied-toi ! »","« 2 + 2 = 5 »","« x est un nombre pair »"],
+ answer:2,explanation:"Une proposition est une affirmation à laquelle on peut attribuer vrai ou faux. « 2+2=5 » est fausse, mais c'est bien une proposition. Les questions, ordres ne le sont pas. « x est pair » est un <b>prédicat</b> (dépend de x)."},
+
+{id:2,type:"mcq",diff:"easy",text:"Quelle est la table de vérité de l'implication <code>a → b</code> ?",
+ opts:["Fausse uniquement quand a=1 et b=0","Fausse uniquement quand a=0 et b=1","Fausse quand a ≠ b","Toujours vraie sauf quand a=b=0"],
+ answer:0,explanation:"L'implication n'est fausse que dans un seul cas : quand l'hypothèse est vraie et la conclusion est fausse (a=1, b=0). Dans tous les autres cas, elle est vraie."},
+
+{id:3,type:"mcq",diff:"easy",text:"La formule <code>a ∨ ¬a</code> est :",
+ opts:["Une antilogie","Satisfaisable mais pas tautologie","Une tautologie","Cela dépend de la valeur de a"],
+ answer:2,explanation:"Pour toute distribution δ, soit δ(a)=1 donc a est vrai, soit δ(a)=0 donc ¬a est vrai. Dans les deux cas, a ∨ ¬a = 1. C'est le <b>tiers exclus</b>."},
+
+{id:4,type:"mcq",diff:"easy",text:"La formule <code>a ∧ ¬a</code> est :",
+ opts:["Une tautologie","Satisfaisable","Une antilogie (contradiction)","Équivalente à a"],
+ answer:2,explanation:"Il est impossible que a et ¬a soient vrais simultanément. Pour toute distribution, a ∧ ¬a = 0. C'est une <b>antilogie</b> (insatisfaisable)."},
+
+{id:5,type:"mcq",diff:"medium",text:"Quelle formule est équivalente à <code>¬(a ∧ b)</code> par De Morgan ?",
+ opts:["¬a ∧ ¬b","¬a ∨ ¬b","a ∨ b","¬a → ¬b"],
+ answer:1,explanation:"Loi de De Morgan : ¬(A ∧ B) eq (¬A) ∨ (¬B). La négation d'un ET donne un OU avec négation de chaque membre."},
+
+{id:6,type:"mcq",diff:"medium",text:"Quelle formule est équivalente à <code>a → b</code> ?",
+ opts:["b → a","¬a → ¬b","¬a ∨ b","a ∧ ¬b"],
+ answer:2,explanation:"(a → b) eq (¬a ∨ b). C'est une identité fondamentale : l'implication se réécrit en disjonction."},
+
+{id:7,type:"mcq",diff:"medium",text:"La <b>contraposée</b> de <code>a → b</code> est :",
+ opts:["b → a","¬a → ¬b","¬b → ¬a","¬(a → b)"],
+ answer:2,explanation:"Contraposée : (a → b) eq (¬b → ¬a). Si « a implique b », alors « non b implique non a »."},
+
+{id:8,type:"input",diff:"medium",text:"Évaluer <code>(1 → 0) ∧ (0 → 1)</code>. Donner le résultat (0 ou 1).",
+ answer:"0",accept:["0"],explanation:"(1→0) = 0 (seul cas où l'implication est fausse). (0→1) = 1. Donc 0 ∧ 1 = <b>0</b>."},
+
+{id:9,type:"input",diff:"medium",text:"Évaluer <code>¬(1 ∨ 0) ∧ (0 → 0)</code>. Résultat (0 ou 1).",
+ answer:"0",accept:["0"],explanation:"¬(1 ∨ 0) = ¬1 = 0. (0→0) = 1. Donc 0 ∧ 1 = <b>0</b>."},
+
+{id:10,type:"mcq",diff:"medium",text:"<code>(a ⟷ b)</code> est équivalent à :",
+ opts:["(a → b) ∨ (b → a)","(a ∧ b) ∨ (¬a ∧ ¬b)","(a ∨ b) ∧ (¬a ∨ ¬b)","¬a ⟷ b"],
+ answer:1,explanation:"(a ⟷ b) eq (a ∧ b) ∨ (¬a ∧ ¬b). L'équivalence est vraie quand les deux ont la même valeur."},
+
+{id:11,type:"mcq",diff:"medium",text:"Combien de distributions de vérité existent pour une formule à <b>3</b> variables propositionnelles ?",
+ opts:["3","6","8","16"],
+ answer:2,explanation:"Avec n variables, il y a 2<sup>n</sup> distributions. Pour n=3 : 2³ = <b>8</b>."},
+
+{id:12,type:"mcq",diff:"hard",text:"La formule <code>((a ∧ b) → a)</code> est :",
+ opts:["Satisfaisable mais pas tautologie","Une tautologie","Une antilogie","Équivalente à a ∧ b"],
+ answer:1,explanation:"Si a∧b est vrai, alors a est vrai, donc l'implication est vraie. Si a∧b est faux, l'implication est vraie (hypothèse fausse). C'est donc une <b>tautologie</b>."},
+
+{id:13,type:"input",diff:"hard",text:"Pour la formule <code>A = ((¬a ∨ b) ∧ c) → (a ∧ ¬b)</code>, donner δ(A) quand a=0, b=0, c=1.",
+ answer:"0",accept:["0"],explanation:"¬a∨b = 1∨0 = 1. F = 1∧1 = 1. G = a∧¬b = 0∧1 = 0. A = F→G = 1→0 = <b>0</b>."},
+
+{id:14,type:"mcq",diff:"hard",text:"Soit B = ((p∨r) ∧ (q∨¬r)) → (p∨q). Cette formule est :",
+ opts:["Satisfaisable mais pas tautologie","Une antilogie","Une tautologie","Équivalente à p∨q"],
+ answer:2,explanation:"Vérifiable par table de vérité (8 lignes, toutes donnent 1). C'est une <b>tautologie</b> : si (p∨r) et (q∨¬r) sont vrais, alors au moins l'un de p ou q l'est."},
+
+{id:15,type:"mcq",diff:"hard",text:"Quelle est la différence entre <code>⟷</code> et <code>eq</code> ?",
+ opts:["Aucune, ce sont des synonymes","⟷ est un connecteur du langage formel, eq est dans le métalangage (vrai pour toute distribution)","⟷ est pour les tautologies, eq pour les antilogies","eq est un connecteur et ⟷ est une notation raccourcie"],
+ answer:1,explanation:"⟷ est un opérateur : (F⟷G) est une formule vraie pour une distribution donnée. « F eq G » signifie que F et G ont la même valeur pour <b>toute</b> distribution, i.e. ⊨ (F⟷G)."}
+];
+
+let state;
+function loadState(){try{state=JSON.parse(localStorage.getItem(STATE_KEY))||{}}catch(e){state={}}if(!state.answered)state={answered:{},right:0,wrong:0,errorCounts:{}}}
+function saveState(){localStorage.setItem(STATE_KEY,JSON.stringify(state))}
+function render(){
+  loadState();const c=document.getElementById("qc");c.innerHTML="";
+  let done=0;
+  Q.forEach((q,qi)=>{
+    const ans=state.answered[q.id];const isDone=ans!==undefined;if(isDone)done++;
+    const ec=state.errorCounts[q.id]||0;
+    const div=document.createElement("div");div.className="qcard"+(isDone?(ans===true?" correct":" wrong"):"");
+    let inner=`<div class="qhdr"><span class="qnum">Q${q.id}</span><span class="qdiff ${q.diff}">${q.diff}</span>${ec>0?`<span class="errcnt">↻ ${ec}</span>`:""}</div><div class="qtext">${q.text}</div>`;
+    if(q.type==="mcq"){
+      inner+=`<div class="opts" data-qid="${q.id}">`;
+      q.opts.forEach((o,oi)=>{
+        let cls="opt";if(isDone){cls+=" locked";if(oi===q.answer)cls+=" c-right";else if(ans===false&&state.answered[q.id+"_sel"]===oi)cls+=" c-wrong";}
+        inner+=`<div class="${cls}" data-oi="${oi}" onclick="pickMCQ(${q.id},${oi})"><div class="marker">${isDone?(oi===q.answer?"✓":(state.answered[q.id+"_sel"]===oi?"✗":"")):"ABCD"[oi]}</div><span>${o}</span></div>`;
+      });
+      inner+="</div>";
+    } else {
+      const val=isDone?(state.answered[q.id+"_val"]||""):"";
+      inner+=`<div class="input-row"><input id="inp${q.id}" value="${val}" placeholder="Réponse..." ${isDone?"disabled":""} class="${isDone?(ans?"c-right":"c-wrong"):""}" onkeydown="if(event.key==='Enter')submitInput(${q.id})"><button class="submit-btn" onclick="submitInput(${q.id})" ${isDone?"disabled":""}>Vérifier</button></div>`;
+    }
+    inner+=`<div class="expl ${isDone?"show":""} ${isDone?(ans?"right":"wrong"):""}">${isDone?(ans?"✅ Correct — ":"❌ Incorrect — ":"")+q.explanation:""}</div>`;
+    if(isDone)inner+=`<div class="rstq"><button onclick="resetQ(${q.id})">↻ Refaire</button></div>`;
+    div.innerHTML=inner;c.appendChild(div);
+  });
+  updateScore(done);
+}
+function pickMCQ(qid,oi){
+  const q=Q.find(x=>x.id===qid);if(!q||state.answered[qid]!==undefined)return;
+  const correct=oi===q.answer;
+  state.answered[qid]=correct;state.answered[qid+"_sel"]=oi;
+  if(correct)state.right++;else{state.wrong++;state.errorCounts[qid]=(state.errorCounts[qid]||0)+1;}
+  saveState();render();
+}
+function submitInput(qid){
+  const q=Q.find(x=>x.id===qid);if(!q||state.answered[qid]!==undefined)return;
+  const inp=document.getElementById("inp"+qid);const val=inp.value.trim();if(!val)return;
+  const correct=q.accept.some(a=>val.toLowerCase()===a.toLowerCase());
+  state.answered[qid]=correct;state.answered[qid+"_val"]=val;
+  if(correct)state.right++;else{state.wrong++;state.errorCounts[qid]=(state.errorCounts[qid]||0)+1;}
+  saveState();render();
+}
+function resetQ(qid){
+  delete state.answered[qid];delete state.answered[qid+"_sel"];delete state.answered[qid+"_val"];
+  const q=Q.find(x=>x.id===qid);const wasRight=state.answered[qid];
+  state.right=0;state.wrong=0;
+  Q.forEach(qq=>{const a=state.answered[qq.id];if(a===true)state.right++;else if(a===false)state.wrong++;});
+  saveState();render();
+}
+function resetAll(){if(!confirm("Réinitialiser ce module ?"))return;localStorage.removeItem(STATE_KEY);render();}
+function updateScore(done){
+  document.getElementById("sR").textContent=state.right;
+  document.getElementById("sW").textContent=state.wrong;
+  const te=Object.values(state.errorCounts||{}).reduce((a,b)=>a+b,0);
+  document.getElementById("sE").textContent=te;
+  document.getElementById("fp").textContent=done;
+  document.getElementById("pb").style.width=Math.round(done/Q.length*100)+"%";
+}
+render();
+</script>
+</body>
+</html>
