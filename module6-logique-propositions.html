@@ -149,7 +149,7 @@ function render(){
       const val=isDone?(state.answered[q.id+"_val"]||""):"";
       inner+=`<div class="input-row"><input id="inp${q.id}" value="${val}" placeholder="Réponse..." ${isDone?"disabled":""} class="${isDone?(ans?"c-right":"c-wrong"):""}" onkeydown="if(event.key==='Enter')submitInput(${q.id})"><button class="submit-btn" onclick="submitInput(${q.id})" ${isDone?"disabled":""}>Vérifier</button></div>`;
     }
-    inner+=`<div class="expl ${isDone?"show":""} ${isDone?(ans?"right":"wrong"):""}">${isDone?(ans?"✅ Correct — ":"❌ Incorrect — ":"")+q.explanation:""}</div>`;
+    inner+=`<div class="expl ${isDone?"show":""} ${isDone?(ans?"right":"wrong"):""}">${isDone?(ans?"✅ Correct — ":"❌ Incorrect — ")+q.explanation:""}</div>`;
     if(isDone)inner+=`<div class="rstq"><button onclick="resetQ(${q.id})">↻ Refaire</button></div>`;
     div.innerHTML=inner;c.appendChild(div);
   });
