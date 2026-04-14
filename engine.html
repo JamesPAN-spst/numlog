@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karnaugh Map True Topology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #020617; font-family: 'Consolas', monospace; color: #e2e8f0; }
+        #canvas-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; padding: 2rem; display: flex; flex-direction: column; justify-content: space-between; }
+        .panel { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(51, 65, 85, 0.8); backdrop-filter: blur(12px); border-radius: 12px; padding: 1.5rem; pointer-events: auto; }
+        .btn { background: #1e293b; border: 1px solid #3b82f6; color: #60a5fa; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; font-weight: bold; font-size: 0.875rem; }
+        .btn:hover { background: #3b82f6; color: #fff; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .btn.active { background: #22d3ee; color: #000; border-color: #22d3ee; box-shadow: 0 0 20px rgba(34, 211, 238, 0.6); }
+        
+        /* 3D 空间中的 HTML 标签 */
+        .node-label {
+            position: absolute;
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid #3b82f6;
+            color: #22d3ee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.2s;
+        }
+        .node-label.active {
+            background: #22d3ee;
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 10px #22d3ee;
+            z-index: 100;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <!-- 用于挂载 HTML 标签的容器 -->
+    <div id="labels-container" style="position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 5; pointer-events: none;"></div>
+
+    <div id="ui-layer">
+        <header class="flex justify-between items-start">
+            <div class="panel max-w-md">
+                <h1 class="text-xl font-bold text-cyan-400 mb-1">L1 Engine: K-Map Topology</h1>
+                <p class="text-xs text-slate-400 mb-4">4-Variable Boolean Space (Hamming Distance = 1)</p>
+                <div class="flex gap-2">
+                    <button class="btn active" id="btn-2d" onclick="switchTopology('2d')">二维展开 (2D Grid)</button>
+                    <button class="btn" id="btn-torus" onclick="switchTopology('torus')">拓扑卷曲 (Torus)</button>
+                    <button class="btn" id="btn-hypercube" onclick="switchTopology('hypercube')">超立方体 (Tesseract)</button>
+                </div>
+                <div class="mt-4 p-3 bg-slate-900/80 rounded border border-slate-700">
+                    <div id="desc-2d" class="text-sm text-slate-300">
+                        <strong class="text-blue-400">教科书视角：2D 降维平面</strong><br>
+                        你平时做题看到的表格。注意看那些**穿过整个屏幕的超长连线**。它们证明了四个角和左右边缘在物理上是“硬连接”的。
+                    </div>
+                    <div id="desc-torus" class="text-sm text-slate-300 hidden">
+                        <strong class="text-green-400">拓扑视角：三维轮胎 (Torus)</strong><br>
+                        把 2D 表格的左右边缘对接（变成圆柱），再把上下边缘对接（弯成轮胎）。所有的超长连线瞬间变成了相邻的短线！这就是为什么卡诺图可以“越界画圈”。
+                    </div>
+                    <div id="desc-hypercube" class="text-sm text-slate-300 hidden">
+                        <strong class="text-purple-400">代数视角：4维超立方体</strong><br>
+                        布尔代数的真实底层。16个顶点，每个顶点必定且只有 4 个邻居（改变 A/B/C/D 中任意一个）。卡诺图本质上就是在寻找这个超立方体上的“面”和“体”。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="text-xs text-slate-400 uppercase tracking-widest mb-1">Hover Pointer</div>
+                <div id="hover-info" class="text-xl font-bold text-cyan-300 h-8">--</div>
+                <div class="text-xs text-slate-500 mt-2">邻接节点 (Hamming Dist = 1):</div>
+                <div id="hover-neighbors" class="text-sm text-blue-400 h-6">--</div>
+            </div>
+        </header>
+
+        <footer class="flex justify-between items-end">
+            <div class="panel text-xs text-slate-400">
+                <span class="text-cyan-400 font-bold">I/O 控制</span><br>
+                [左键拖拽] 旋转空间<br>
+                [滚轮滚动] 缩放空间<br>
+                [鼠标悬停] 查探内存指针与物理连接
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let nodeMeshes = [];
+        let edgeLines = [];
+        let htmlLabels = [];
+        let targetPositions = [];
+        
+        // 核心数据结构：16个节点
+        // 使用标准的格雷码顺序来排列 2D 矩阵
+        const grayOrder = [0, 1, 3, 2];
+        const nodes = [];
+        
+        // 预生成 16 个节点的数据
+        for (let r = 0; r < 4; r++) {
+            for (let c = 0; c < 4; c++) {
+                // A, B 对应行 (r), C, D 对应列 (c)
+                const AB = grayOrder[r];
+                const CD = grayOrder[c];
+                const val = (AB << 2) | CD;
+                const binStr = val.toString(2).padStart(4, '0');
+                nodes.push({ id: val, bin: binStr, r, c });
+            }
+        }
+        
+        // 找出所有汉明距离为 1 的边
+        const edges = [];
+        for (let i = 0; i < 16; i++) {
+            for (let j = i + 1; j < 16; j++) {
+                const xor = nodes[i].id ^ nodes[j].id;
+                // 只有 1 个 bit 为 1 时，才是真正的 2 的幂
+                if (xor !== 0 && (xor & (xor - 1)) === 0) {
+                    edges.push({ a: i, b: j });
+                }
+            }
+        }
+
+        // Raycaster for hover
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.onload = function() {
+            initEngine();
+            calculatePositions('2d');
+            animate();
+            
+            // 鼠标交互
+            window.addEventListener('mousemove', onMouseMove, false);
+        };
+
+        function initEngine() {
+            const container = document.getElementById('canvas-container');
+            const labelsContainer = document.getElementById('labels-container');
+            
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 0, 40);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            if (typeof THREE.OrbitControls !== 'undefined') {
+                controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+            }
+
+            // 生成物理球体 (Nodes)
+            const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            for (let i = 0; i < 16; i++) {
+                const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.userData = { index: i, bin: nodes[i].bin };
+                scene.add(mesh);
+                nodeMeshes.push(mesh);
+                targetPositions.push(new THREE.Vector3());
+
+                // 生成 HTML 标签
+                const label = document.createElement('div');
+                label.className = 'node-label';
+                label.textContent = nodes[i].bin;
+                labelsContainer.appendChild(label);
+                htmlLabels.push(label);
+            }
+
+            // 生成物理导线 (Edges)
+            const edgeMat = new THREE.LineBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.6 });
+            for (let e of edges) {
+                const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+                const line = new THREE.Line(geo, edgeMat);
+                scene.add(line);
+                edgeLines.push({ line, a: e.a, b: e.b });
+            }
+
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        // 计算三种状态下的绝对物理坐标
+        function calculatePositions(type) {
+            for (let i = 0; i < 16; i++) {
+                const node = nodes[i];
+                let x = 0, y = 0, z = 0;
+
+                if (type === '2d') {
+                    // 展开成 4x4 平面网格
+                    const spacing = 4.5;
+                    x = (node.c - 1.5) * spacing;
+                    y = -(node.r - 1.5) * spacing; // Y轴反转，符合阅读习惯
+                    z = 0;
+                } 
+                else if (type === 'torus') {
+                    // 映射到三维圆环
+                    const R = 8;     // 大圆半径 (横向卷曲)
+                    const r_tube = 3.5; // 管半径 (纵向卷曲)
+                    
+                    // 列索引对应 Theta, 行索引对应 Phi
+                    const theta = (node.c / 4) * Math.PI * 2;
+                    const phi = (node.r / 4) * Math.PI * 2;
+                    
+                    x = (R + r_tube * Math.cos(phi)) * Math.cos(theta);
+                    z = (R + r_tube * Math.cos(phi)) * Math.sin(theta);
+                    y = r_tube * Math.sin(phi);
+                }
+                else if (type === 'hypercube') {
+                    // 4维立方体的标准 3D 投影 (大立方体嵌套小立方体)
+                    // 提取每一位
+                    const A = (node.id >> 3) & 1;
+                    const B = (node.id >> 2) & 1;
+                    const C = (node.id >> 1) & 1;
+                    const D = node.id & 1;
+                    
+                    // A 位决定是内层还是外层
+                    const scale = A === 0 ? 4 : 10;
+                    
+                    // B, C, D 决定 XYZ 坐标
+                    x = (B === 1 ? 1 : -1) * scale;
+                    y = (C === 1 ? 1 : -1) * scale;
+                    z = (D === 1 ? 1 : -1) * scale;
+                }
+
+                targetPositions[i].set(x, y, z);
+            }
+            
+            // 调整相机的最佳观赏距离
+            if (type === '2d') {
+                camera.position.set(0, 0, 30);
+            } else if (type === 'torus') {
+                camera.position.set(0, 15, 25);
+            } else {
+                camera.position.set(15, 15, 25);
+            }
+        }
+
+        window.switchTopology = function(type) {
+            document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + type).classList.add('active');
+            
+            document.querySelectorAll('[id^="desc-"]').forEach(d => d.classList.add('hidden'));
+            document.getElementById('desc-' + type).classList.remove('hidden');
+
+            calculatePositions(type);
+        }
+
+        let hoveredIndex = -1;
+
+        function onMouseMove(event) {
+            // 计算归一化设备坐标
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(nodeMeshes);
+
+            if (intersects.length > 0) {
+                const idx = intersects[0].object.userData.index;
+                if (hoveredIndex !== idx) {
+                    hoveredIndex = idx;
+                    updateHoverState();
+                }
+            } else {
+                if (hoveredIndex !== -1) {
+                    hoveredIndex = -1;
+                    updateHoverState();
+                }
+            }
+        }
+
+        function updateHoverState() {
+            // 重置所有颜色和连线
+            nodeMeshes.forEach(m => m.material.color.setHex(0x3b82f6));
+            edgeLines.forEach(e => {
+                e.line.material.color.setHex(0x334155);
+                e.line.material.opacity = 0.6;
+                e.line.material.linewidth = 1;
+            });
+            htmlLabels.forEach(l => l.classList.remove('active'));
+            document.getElementById('hover-info').textContent = '--';
+            document.getElementById('hover-neighbors').textContent = '--';
+
+            if (hoveredIndex === -1) return;
+
+            // 激活当前节点
+            nodeMeshes[hoveredIndex].material.color.setHex(0x22d3ee);
+            htmlLabels[hoveredIndex].classList.add('active');
+            document.getElementById('hover-info').textContent = nodes[hoveredIndex].bin;
+
+            // 查找并激活邻居
+            const neighbors = [];
+            edgeLines.forEach(e => {
+                if (e.a === hoveredIndex || e.b === hoveredIndex) {
+                    e.line.material.color.setHex(0x22d3ee);
+                    e.line.material.opacity = 1.0;
+                    
+                    const neighborIdx = e.a === hoveredIndex ? e.b : e.a;
+                    nodeMeshes[neighborIdx].material.color.setHex(0x10b981); // 绿色标出邻居
+                    htmlLabels[neighborIdx].classList.add('active');
+                    neighbors.push(nodes[neighborIdx].bin);
+                }
+            });
+            
+            document.getElementById('hover-neighbors').textContent = neighbors.join(', ');
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // 渲染与物理引擎 Loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 1. 物理插值 (Lerp)：实现丝滑的维度变换
+            for (let i = 0; i < 16; i++) {
+                nodeMeshes[i].position.lerp(targetPositions[i], 0.08);
+            }
+
+            // 2. 实时更新导线 (Edges) 的两端顶点
+            for (let e of edgeLines) {
+                const positions = new Float32Array(6);
+                const posA = nodeMeshes[e.a].position;
+                const posB = nodeMeshes[e.b].position;
+                
+                positions[0] = posA.x; positions[1] = posA.y; positions[2] = posA.z;
+                positions[3] = posB.x; positions[4] = posB.y; positions[5] = posB.z;
+                
+                e.line.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            }
+
+            // 3. 将 3D 坐标投影到 2D 屏幕，更新 HTML 标签位置
+            for (let i = 0; i < 16; i++) {
+                const pos = nodeMeshes[i].position.clone();
+                pos.project(camera);
+                
+                // 转换为屏幕 CSS 像素坐标
+                const x = (pos.x * .5 + .5) * window.innerWidth;
+                const y = (pos.y * -.5 + .5) * window.innerHeight;
+                
+                // 隐藏相机背后的标签
+                if (pos.z > 1) {
+                    htmlLabels[i].style.opacity = '0';
+                } else {
+                    htmlLabels[i].style.opacity = '1';
+                    htmlLabels[i].style.left = `${x}px`;
+                    htmlLabels[i].style.top = `${y}px`;
+                }
+            }
+
+            if (controls) controls.update();
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+</html>
