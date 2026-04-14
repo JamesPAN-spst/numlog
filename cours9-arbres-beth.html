@@ -9,48 +9,312 @@
 <h1>Arbres de Beth & déduction</h1>
 <div class="sub">C11 — Arbres de vérité, consistance, conséquence logique</div>
 
-<h2>1. Principe</h2>
-<p>Les arbres de Beth décomposent une formule en sous-formules jusqu'aux atomes. Chaque branche ouverte donne une distribution satisfaisante.</p>
+<!-- ═══════════════════════════════════════════ -->
+<h2>1. Introduction</h2>
+<p>Les arbres de Beth (aussi appelés <b>arbres de vérité</b>) peuvent remplacer les tables de vérité et les tableaux de Karnaugh. Ils permettent de :</p>
+<pre>• Trouver les distributions de vérité qui rendent une formule F vraie
+• Déduire des FND ou FNC souvent simplifiées par rapport aux tables de vérité
+• Montrer qu'une formule est une tautologie
+• Montrer la (non-)consistance d'un ensemble de formules</pre>
+<div class="info"><b>ℹ</b> L'appellation « arbres de Beth » est en l'honneur du logicien néerlandais <b>Evert Willem Beth</b> (1908–1964).</div>
 
-<h2>2. Règles de décomposition</h2>
+<!-- ═══════════════════════════════════════════ -->
+<h2>2. Règle pour la conjonction (∧)</h2>
+<p>Si les deux formules A et B sont des conséquences de la formule initiale, on ajoute les deux sur la <b>même branche</b>.</p>
+<pre>   A ∧ B
+     │
+     A        ← même branche (non-branching)
+     │
+     B</pre>
+<p>Explication : si A∧B est vrai, alors A <b>et</b> B sont vrais simultanément.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>3. Règle pour la disjonction (∨)</h2>
+<p>Si l'une au moins des formules A ou B est une conséquence de la formule initiale, on crée <b>une branche pour A et une pour B</b>.</p>
+<pre>   A ∨ B
+    / \
+   A   B      ← branchement (branching)</pre>
+<p>Explication : au moins l'un des deux est vrai, mais on ne sait pas lequel → on explore les deux cas.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>4. Règle pour la négation (¬)</h2>
+<p>La négation est simplifiée en utilisant les <b>lois de De Morgan</b> :</p>
+<pre>¬(A ∧ B)  eq  (¬A) ∨ (¬B)     → branchement : ¬A | ¬B
+¬(A ∨ B)  eq  (¬A) ∧ (¬B)     → même branche : ¬A puis ¬B</pre>
+<p>Schéma pour <code>¬(A ∧ B)</code> :</p>
+<pre>  ¬(A ∧ B)
+    / \
+  ¬A   ¬B</pre>
+<p>Schéma pour <code>¬(A ∨ B)</code> :</p>
+<pre>  ¬(A ∨ B)
+      │
+     ¬A
+      │
+     ¬B</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>5. Règle pour l'implication (→)</h2>
+<pre>A → B      eq  (¬A) ∨ B        → branchement : ¬A | B
+¬(A → B)   eq  A ∧ (¬B)        → même branche : A puis ¬B</pre>
+<p>Schéma pour <code>A → B</code> :</p>
+<pre>   A → B
+    / \
+  ¬A   B</pre>
+<p>Schéma pour <code>¬(A → B)</code> :</p>
+<pre>  ¬(A → B)
+      │
+      A
+      │
+     ¬B</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>6. Règle pour l'équivalence (⟷)</h2>
+<pre>A ⟷ B     eq  (A → B) ∧ (B → A)
+            eq  (¬A ∨ B) ∧ (¬B ∨ A)
+            eq  (A ∧ B) ∨ (¬A ∧ ¬B)   → branchement</pre>
+<p>Schéma :</p>
+<pre>    A ⟷ B
+     /   \
+    A    ¬A       ← branche gauche : A puis B
+    |     |
+    B    ¬B       ← branche droite : ¬A puis ¬B</pre>
+
+<pre>¬(A ⟷ B)  eq  ¬((¬A∨B) ∧ (¬B∨A))
+            eq  (A ∧ ¬B) ∨ (B ∧ ¬A)    → branchement</pre>
+<p>Schéma :</p>
+<pre>   ¬(A ⟷ B)
+     /    \
+    A     ¬A       ← branche gauche : A puis ¬B
+    |      |
+   ¬B      B       ← branche droite : ¬A puis B</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>7. Tableau récapitulatif des règles</h2>
 <table>
-<tr><th>Formule</th><th>Type</th><th>Décomposition</th></tr>
-<tr><td>A ∧ B</td><td>Même branche</td><td>A puis B (en dessous)</td></tr>
-<tr><td>A ∨ B</td><td>Branchement</td><td>Branche A | Branche B</td></tr>
-<tr><td>A → B</td><td>Branchement</td><td>Branche ¬A | Branche B</td></tr>
-<tr><td>¬(A → B)</td><td>Même branche</td><td>A puis ¬B</td></tr>
-<tr><td>¬(A ∧ B)</td><td>Branchement</td><td>Branche ¬A | Branche ¬B</td></tr>
-<tr><td>¬(A ∨ B)</td><td>Même branche</td><td>¬A puis ¬B</td></tr>
-<tr><td>A ⟷ B</td><td>Branchement</td><td>(A,B) | (¬A,¬B)</td></tr>
-<tr><td>¬(A ⟷ B)</td><td>Branchement</td><td>(¬A,B) | (A,¬B)</td></tr>
+<tr><th>Formule</th><th>Équivalence</th><th>Type</th><th>Décomposition</th></tr>
+<tr><td>A ∧ B</td><td>—</td><td>Même branche</td><td>A puis B (en dessous)</td></tr>
+<tr><td>A ∨ B</td><td>—</td><td>Branchement</td><td>Branche A | Branche B</td></tr>
+<tr><td>A → B</td><td>(¬A) ∨ B</td><td>Branchement</td><td>Branche ¬A | Branche B</td></tr>
+<tr><td>¬(A → B)</td><td>A ∧ (¬B)</td><td>Même branche</td><td>A puis ¬B</td></tr>
+<tr><td>¬(A ∧ B)</td><td>(¬A) ∨ (¬B)</td><td>Branchement</td><td>Branche ¬A | Branche ¬B</td></tr>
+<tr><td>¬(A ∨ B)</td><td>(¬A) ∧ (¬B)</td><td>Même branche</td><td>¬A puis ¬B</td></tr>
+<tr><td>A ⟷ B</td><td>(A∧B) ∨ (¬A∧¬B)</td><td>Branchement</td><td>(A,B) | (¬A,¬B)</td></tr>
+<tr><td>¬(A ⟷ B)</td><td>(A∧¬B) ∨ (¬A∧B)</td><td>Branchement</td><td>(A,¬B) | (¬A,B)</td></tr>
 </table>
 
-<div class="tip"><b>✓ Astuce :</b> ∧ et ses dérivés (¬∨, ¬→) → même branche. ∨ et ses dérivés (¬∧, →) → branchement. Commencer par les conjonctions pour limiter les branches.</div>
+<div class="tip"><b>✓ Astuce mnémotechnique :</b> le <b>∧</b> et ses dérivés (¬∨, ¬→) → <b>même branche</b>. Le <b>∨</b> et ses dérivés (¬∧, →) → <b>branchement</b>. Commencer de préférence par les conjonctions pour limiter le nombre de branches.</div>
 
-<h2>3. Branches fermées et ouvertes</h2>
-<p><b>Branche fermée</b> (✗) : contient p ET ¬p pour une même variable → contradictoire.</p>
-<p><b>Arbre fermé</b> : toutes les branches fermées → formule <b>insatisfaisable</b>.</p>
-<p><b>Branche ouverte</b> : donne les valeurs des atomes → modèle satisfaisant.</p>
+<!-- ═══════════════════════════════════════════ -->
+<h2>8. Processus inductif</h2>
+<p>De façon <b>inductive</b>, on décompose de la même manière les sous-formules obtenues.</p>
+<p>Lorsqu'une sous-formule est un <b>atome</b> (variable propositionnelle) ou <b>sa négation</b>, c'est qu'on a atteint une <b>feuille</b> de l'arbre : on s'arrête.</p>
 
-<h2>4. Applications</h2>
-<pre>• Arbre de F → FND (chaque branche ouverte = un terme conjonctif)
-• Arbre de ¬F → FNC (via négation de la FND de ¬F)
-• Arbre de ¬F fermé → F est une tautologie</pre>
+<!-- ═══════════════════════════════════════════ -->
+<h2>9. Exemple détaillé : arbre de F</h2>
+<p>Soit <b>F = ((¬a ∨ b) ∧ c) → (a ∧ ¬b)</b></p>
+<p>F est une implication A → B avec A = (¬a∨b)∧c et B = a∧¬b.</p>
+<pre>          ((¬a ∨ b) ∧ c) → (a ∧ ¬b)                 ← formule initiale
+                   /              \
+        ¬((¬a ∨ b) ∧ c)        (a ∧ ¬b)             ← → donne branchement
+             /      \              |
+      ¬(¬a ∨ b)     ¬c            a                  ← ¬∧ = branchement ; ∧ = même branche
+           |                      |
+        a ∧ ¬b                   ¬b
+           |
+           a
+           |
+          ¬b</pre>
 
-<h2>5. Conséquence logique (⊨)</h2>
-<p>∑ ⊨ C signifie : toute distribution satisfaisant ∑ satisfait aussi C.</p>
-<p><b>Méthode</b> : construire l'arbre de {H₁, H₂, ..., Hₙ, ¬C} (tronc = hypothèses + négation conclusion).</p>
-<pre>Arbre fermé → ∑ ∪ {¬C} inconsistant → déduction légitime
-Branche ouverte → contre-exemple existe → déduction NON légitime</pre>
+<p><b>Résultat :</b> 3 branches, mais 2 ont les mêmes atomes (a, ¬b) :</p>
+<pre>Branche 1 : a, ¬b       (issue de ¬(¬a∨b) → a∧¬b)
+Branche 2 : ¬c           (issue de ¬c)
+Branche 3 : a, ¬b       (issue de a∧¬b directement)</pre>
 
-<h2>6. Consistance</h2>
-<p><b>Consistant</b> (satisfaisable) : ∃ au moins une branche ouverte.</p>
-<p><b>Inconsistant</b> : arbre fermé → pas de distribution satisfaisant toutes les formules simultanément.</p>
-<div class="warn"><b>⚠ Si ∑ est inconsistant :</b> ∑ ⊨ C est TOUJOURS légitime, quelle que soit C. « D'un ensemble contradictoire, on déduit n'importe quoi. »</div>
+<div class="info"><b>Lecture :</b> Si l'on rend vrais tous les atomes d'une branche, on rend vraies toutes les formules de cette branche, donc la formule d'origine. Il suffit que (a∧¬b) ou ¬c soit vrai pour que F le soit.</div>
 
-<h2>7. Théorème de la déduction</h2>
-<pre>∑ ∪ {H} ⊨ C   ⟺   ∑ ⊨ (H → C)
-Cas ∑ = ∅ :   H ⊨ C   ⟺   ⊨ (H → C)</pre>
+<!-- ═══════════════════════════════════════════ -->
+<h2>10. Arbre de F → FND</h2>
+<p>Chaque branche ouverte correspond à un <b>terme conjonctif</b> (conjonction des atomes de la branche). L'ensemble des branches donne la <b>FND</b>.</p>
+<p>Pour F = ((¬a∨b) ∧ c) → (a ∧ ¬b) :</p>
+<pre>Branches 1 et 3 : a ∧ ¬b    (identiques, on n'en garde qu'un)
+Branche 2 :        ¬c
+
+FND de F = (a ∧ ¬b) ∨ ¬c</pre>
+<div class="tip"><b>✓</b> Cette FND est souvent <b>simplifiée</b> par rapport à celle obtenue par la méthode des tables de vérité.</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>11. Arbre de ¬F → FNC</h2>
+<p>Pour obtenir une FNC de F, on construit l'arbre de <b>¬F</b>.</p>
+<p>¬F = ¬(((¬a ∨ b) ∧ c) → (a ∧ ¬b)) = ((¬a ∨ b) ∧ c) ∧ ¬(a ∧ ¬b)</p>
+<pre>     ((¬a ∨ b) ∧ c) ∧ ¬(a ∧ ¬b)          ← ∧ même branche
+                  |
+          (¬a ∨ b) ∧ c                     ← ∧ même branche
+                  |
+              ¬a ∨ b                        
+                  |
+                  c
+                  |
+            ¬(a ∧ ¬b)                      ← ¬∧ = branchement
+              /     \
+            ¬a       ¬(¬b)
+                       |
+                       b</pre>
+<p>Deux branches ouvertes :</p>
+<pre>Branche gauche : c, ¬a    → terme conjonctif : c ∧ ¬a
+Branche droite : c, b     → terme conjonctif : c ∧ b
+
+FND de ¬F = (c ∧ ¬a) ∨ (c ∧ b)</pre>
+<p>Pour obtenir la FNC de F :</p>
+<pre>F = ¬(¬F) = ¬((c ∧ ¬a) ∨ (c ∧ b))
+  = ¬(c ∧ ¬a) ∧ ¬(c ∧ b)          ← De Morgan
+  = (¬c ∨ a) ∧ (¬c ∨ ¬b)
+
+FNC de F = (¬c ∨ a) ∧ (¬c ∨ ¬b)</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>12. Branches fermées et arbres fermés</h2>
+<p><b>Branche fermée</b> (notée ✗) : une branche qui comporte une variable propositionnelle <b>et sa négation</b> (p et ¬p). C'est contradictoire.</p>
+<p><b>Arbre fermé</b> : <b>toutes</b> les branches sont fermées → la formule d'origine <b>n'est pas satisfaisable</b>.</p>
+<p><b>Branche ouverte</b> : une branche complètement développée sans contradiction → donne un modèle satisfaisant.</p>
+
+<div class="info"><b>Tautologie :</b> pour montrer que F est une tautologie, il suffit de montrer que l'arbre de <b>¬F est fermé</b> (¬F n'est pas satisfaisable → F est toujours vraie).</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>13. Notion de conséquence logique</h2>
+<p><b>Ensemble satisfaisable :</b> un ensemble de formules ∑ est dit satisfaisable s'il existe une distribution δ qui satisfait toutes les formules de ∑ à la fois :</p>
+<pre>∃δ, ∀F ∈ ∑, δ(F) = 1</pre>
+<p><b>Conséquence logique :</b> soit C une formule n'appartenant pas à ∑. La formule C est dite <b>conséquence</b> de ∑ si toute distribution satisfaisant toutes les formules de ∑ satisfait aussi C :</p>
+<pre>∀δ, (∀F ∈ ∑, δ(F) = 1) ⟹ δ(C) = 1</pre>
+<p>On note <b>∑ ⊨ C</b>. ∑ est l'<b>ensemble d'hypothèses</b>, C est la <b>conclusion</b>.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>14. Arbres de Beth et consistance d'un ensemble</h2>
+<p>Soit un ensemble de formules {H₁, H₂, …, Hₙ}. On lui associe un arbre dont ces formules sont les <b>formules initiales</b> : elles forment le <b>tronc</b> de l'arbre.</p>
+<p>On développe l'arbre de Beth :</p>
+<pre>• S'il existe au moins une branche ouverte :
+  → il existe une distribution satisfaisant toutes les formules
+  → l'ensemble est dit consistant (satisfaisable)
+
+• Si toutes les branches sont fermées :
+  → les formules ne peuvent pas être simultanément satisfaites
+  → l'ensemble est dit inconsistant (insatisfaisable)</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>15. Arbres de Beth et légitimité d'une déduction</h2>
+<p>Peut-on déduire la formule C à partir de l'ensemble de formules ∑ ?</p>
+<p><b>Méthode :</b> on teste si l'ensemble <b>∑ ∪ {¬C}</b> est consistant ou non.</p>
+<pre>Tronc de l'arbre = hypothèses de ∑ + négation de la conclusion (¬C)
+
+• Si l'arbre est fermé (inconsistant) :
+  → il n'existe aucune distribution satisfaisant ∑ et ¬C
+  → toute distribution qui satisfait ∑ satisfait aussi C
+  → la déduction ∑ ⊨ C est LÉGITIME
+
+• Si l'arbre a une branche ouverte (consistant) :
+  → il existe une distribution satisfaisant ∑ et ¬C (contre-exemple)
+  → la déduction ∑ ⊨ C n'est PAS légitime</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>16. Exemples de déduction</h2>
+
+<p><b>Exemple 1 :</b> (p ∧ q) permet de déduire p ?</p>
+<pre>Tronc : p ∧ q , ¬p
+
+   p ∧ q       ← ∧ même branche
+     |
+     p
+     |
+     q
+     |
+    ¬p          ← contradiction : p et ¬p → branche fermée ✗
+
+Arbre fermé → déduction {p∧q} ⊨ p est LÉGITIME ✓</pre>
+
+<p><b>Exemple 2 :</b> p permet de déduire (p ∨ q) ?</p>
+<pre>Tronc : p , ¬(p ∨ q)
+
+     p
+     |
+  ¬(p ∨ q)     ← ¬∨ = même branche (De Morgan)
+     |
+    ¬p          ← contradiction : p et ¬p → branche fermée ✗
+     |
+    ¬q
+
+Arbre fermé → déduction {p} ⊨ (p∨q) est LÉGITIME ✓</pre>
+
+<p><b>Exemple 3 :</b> ∑ = {p, q → (p → r)}. Peut-on déduire C = q → r ?</p>
+<pre>Tronc : p , q → (p → r) , ¬(q → r)
+
+¬(q → r)   eq  q ∧ ¬r         ← ¬→ même branche : q, ¬r
+q → (p → r)                    ← → branchement : ¬q | (p → r)
+  /           \
+¬q            p → r
+ |              / \
+ q ← contradiction  ¬p    r
+      ✗               |    |
+                       p    ¬r ← contradiction
+                    ← contradiction  ✗
+                       ✗
+
+Toutes les branches fermées → déduction ∑ ⊨ (q→r) est LÉGITIME ✓</pre>
+
+<p><b>Exemple 4 :</b> ∑ = {(p∧q)→r, r→s, q∧¬s}. Peut-on déduire C = ¬p ?</p>
+<pre>Tronc : (p∧q)→r , r→s , q∧¬s , ¬(¬p) = p
+
+q∧¬s          ← ∧ même branche : q, ¬s
+(p∧q)→r       ← → branchement : ¬(p∧q) | r
+   /              \
+¬(p∧q)            r
+  / \              |
+¬p   ¬q          r→s       ← → branchement
+ |    |           / \
+ p    q         ¬r   s
+ ✗    ✗          |    |
+                 r    ¬s
+                 ✗    ✗
+
+Toutes les branches fermées → déduction ∑ ⊨ ¬p est LÉGITIME ✓</pre>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>17. Remarques pratiques</h2>
+<div class="tip"><b>✓ Conseils pour construire un arbre :</b>
+<br>• On peut traiter les formules du tronc dans un <b>ordre quelconque</b> : commencer de préférence par les <b>conjonctions</b> (elles ne créent pas de branches).
+<br>• Dès qu'une branche est <b>fermée</b>, on n'a pas besoin de reproduire dans sa suite d'éventuelles sous-formules.
+<br>• Lorsqu'on traite une formule, on écrit les sous-formules à l'extrémité de <b>toutes les branches ouvertes</b> qui passent par la formule considérée.
+<br>• <b>Marquer</b> une formule traitée (✓) pour ne pas la traiter deux fois.
+<br>• <b>Numéroter</b> les formules et leurs enfants pour faciliter le suivi.</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>18. Propriétés de la déduction</h2>
+
+<p><b>Propriété 1 — Ensemble inconsistant :</b></p>
+<div class="warn"><b>⚠</b> Si ∑ est un ensemble de formules <b>inconsistant</b>, alors pour <b>toute</b> formule C, la déduction ∑ ⊨ C est légitime. « D'un ensemble de formules inconsistant, on peut déduire <b>n'importe quoi</b>. »</div>
+<p><i>Exemple :</i> l'ensemble des proverbes est inconsistant (ex. « tel père, tel fils » et « à père avare, enfant prodigue » sont des négations l'un de l'autre). On peut donc déduire de l'ensemble des proverbes n'importe quel énoncé.</p>
+
+<p><b>Propriété 2 — Tautologie :</b></p>
+<p>Si C est une <b>tautologie</b>, C est déductible de <b>tout</b> ensemble de formules ∑. En particulier, une tautologie est déductible de l'ensemble vide ∅.</p>
+
+<p><b>Propriété 3 — Monotonie :</b></p>
+<p>Si ∑ ⊂ ∑' et ∑ ⊨ C, alors <b>∑' ⊨ C</b>. Si une déduction est légitime, on peut toujours ajouter des hypothèses, la déduction reste légitime.</p>
+
+<p><b>Notation ⊨ :</b></p>
+<pre>• ∑ ⊨ C    →  « C est déductible de ∑ »
+• ⊨ F      →  « F est tautologique »  (abréviation de ∅ ⊨ F)</pre>
+<p>Il est cohérent d'utiliser le même symbole ⊨ pour les deux notations.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2>19. Théorème de la déduction</h2>
+<p><b>Théorème :</b> Si ∑ est un ensemble de formules et H une formule donnée, alors :</p>
+<pre>∑ ∪ {H} ⊨ C    ⟺    ∑ ⊨ (H → C)</pre>
+<p>On peut « déplacer » une hypothèse H du côté gauche vers une implication dans la conclusion.</p>
+
+<p><b>Cas particulier ∑ = ∅ :</b></p>
+<pre>H ⊨ C    ⟺    ⊨ (H → C)</pre>
+<p>C'est-à-dire : C est déductible de H si et seulement si H → C est une <b>tautologie</b>. C'est le lien fondamental entre le connecteur → et la déduction ⊨.</p>
+
+<p><b>Remarque :</b> ∑ = {H₁, H₂, …, Hₙ} est un ensemble d'hypothèses. Il est équivalent d'écrire :</p>
+<pre>{H₁, H₂, …, Hₙ} ⊨ C    ⟺    H₁ ∧ H₂ ∧ … ∧ Hₙ ⊨ C</pre>
 
 <nav class="nav"><a href="cours8-boole-karnaugh.html">← Cours 8</a><a href="index.html">Accueil →</a></nav>
 </div></body></html>

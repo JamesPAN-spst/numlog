@@ -16,67 +16,217 @@
 </style>
 </head>
 <body>
-<div class="header"><a href="index.html" class="back">←</a><h1>M9 — Arbres de Beth & déduction</h1><span class="badge">Beth · branches · consistance · ⊨</span><a href="cours9-arbres-beth.html" class="cours-link">📚 Cours</a><div class="score"><span>✓ <span class="g" id="sR">0</span></span><span>✗ <span class="r" id="sW">0</span></span><span>↻ <span class="o" id="sE">0</span></span></div></div>
+<div class="header"><a href="index.html" class="back">←</a><h1>M9 — Arbres de Beth & déduction</h1><span class="badge">Beth · décomposition · FND/FNC · consistance · déduction · ⊨</span><a href="cours9-arbres-beth.html" class="cours-link">📚 Cours</a><div class="score"><span>✓ <span class="g" id="sR">0</span></span><span>✗ <span class="r" id="sW">0</span></span><span>↻ <span class="o" id="sE">0</span></span></div></div>
 <div class="container"><div id="qc"></div></div>
-<div class="footer"><span class="pt"><b id="fp">0</b>/<b id="ft">14</b></span><div class="pbar"><div class="pfill" id="pb" style="width:0%"></div></div><button class="fbtn" onclick="resetAll()">🗑️ Reset</button></div>
+<div class="footer"><span class="pt"><b id="fp">0</b>/<b id="ft">48</b></span><div class="pbar"><div class="pfill" id="pb" style="width:0%"></div></div><button class="fbtn" onclick="resetAll()">🗑️ Reset</button></div>
 <script>
 const STATE_KEY="nl_mod9_state";
 const Q=[
-{id:1,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, la formule <code>A ∧ B</code> se décompose en :",
- opts:["Deux branches : A à gauche, B à droite","Une seule branche : A puis B en dessous","On ne peut pas la décomposer","A ∨ B par De Morgan"],
- answer:1,explanation:"Le ∧ (conjonction) est <b>non-branching</b> : si A∧B est vrai, alors A ET B sont vrais. On les ajoute sur la <b>même branche</b>, l'un sous l'autre."},
+// ===== PARTIE 1 : Introduction aux arbres de Beth =====
+{id:1,type:"mcq",diff:"easy",text:"Les arbres de Beth (aussi appelés arbres de vérité) permettent de :",
+ opts:["Uniquement de simplifier des circuits logiques","Trouver les distributions de vérité rendant une formule vraie, montrer qu'une formule est une tautologie, et vérifier la consistance d'un ensemble de formules","Uniquement de construire des tables de vérité","Calculer des formes normales par la méthode de Karnaugh"],
+ answer:1,explanation:"Les arbres de Beth peuvent remplacer les tables de vérité et les tableaux de Karnaugh. Ils permettent de : trouver les distributions de vérité satisfaisant F, déduire des FND/FNC souvent simplifiées, montrer qu'une formule est une tautologie, et montrer la (non-)consistance d'un ensemble de formules."},
 
-{id:2,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, la formule <code>A ∨ B</code> se décompose en :",
+{id:2,type:"mcq",diff:"easy",text:"L'appellation « arbres de Beth » est en l'honneur de :",
+ opts:["George Boole, mathématicien anglais","Evert Willem Beth, logicien néerlandais (1908–1964)","Maurice Karnaugh, physicien américain","Augustus De Morgan, mathématicien britannique"],
+ answer:1,explanation:"Les arbres de Beth portent le nom du logicien néerlandais <b>Evert Willem Beth</b> (1908–1964). On parle aussi de « méthode des arbres de vérité »."},
+
+// ===== PARTIE 2 : Règles de décomposition =====
+{id:3,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, la formule <code>A ∧ B</code> se décompose en :",
+ opts:["Deux branches : A à gauche, B à droite","Une seule branche : A puis B en dessous (même branche)","On ne peut pas la décomposer","A ∨ B par De Morgan"],
+ answer:1,explanation:"Le ∧ (conjonction) est <b>non-branching</b> : si A∧B est vrai, alors A ET B sont vrais simultanément. On les ajoute sur la <b>même branche</b>, l'un sous l'autre. Les deux formules A et B sont des conséquences de la formule initiale."},
+
+{id:4,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, la formule <code>A ∨ B</code> se décompose en :",
  opts:["Une seule branche : A puis B","Deux branches : A à gauche, B à droite","On inverse : ¬A ∧ ¬B","Trois branches : A, B, et A∧B"],
- answer:1,explanation:"Le ∨ (disjonction) est <b>branching</b> : au moins l'un de A ou B est vrai. On crée <b>deux branches</b> séparées."},
+ answer:1,explanation:"Le ∨ (disjonction) est <b>branching</b> : au moins l'une des formules A ou B est une conséquence de la formule initiale. On crée <b>deux branches</b> séparées : une branche pour A et une pour B."},
 
-{id:3,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>A → B</code> dans un arbre de Beth ?",
+{id:5,type:"mcq",diff:"easy",text:"Comment la négation est-elle simplifiée dans un arbre de Beth ?",
+ opts:["En utilisant les lois de De Morgan : ¬(A∧B) = (¬A)∨(¬B) et ¬(A∨B) = (¬A)∧(¬B)","En supprimant simplement le ¬","En inversant toutes les variables","En appliquant la double négation uniquement"],
+ answer:0,explanation:"La négation ¬ est simplifiée en utilisant les <b>lois de De Morgan</b> : <code>¬(A∧B) = (¬A)∨(¬B)</code> (puis branchement) et <code>¬(A∨B) = (¬A)∧(¬B)</code> (puis même branche)."},
+
+{id:6,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>¬(A ∧ B)</code> dans un arbre de Beth ?",
+ opts:["Même branche : ¬A puis ¬B","Deux branches : ¬A à gauche, ¬B à droite","Même branche : A puis B","Deux branches : A à gauche, B à droite"],
+ answer:1,explanation:"Par De Morgan : ¬(A∧B) = (¬A) ∨ (¬B). C'est une <b>disjonction</b>, donc on fait un <b>branchement</b> : branche ¬A et branche ¬B."},
+
+{id:7,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>¬(A ∨ B)</code> dans un arbre de Beth ?",
+ opts:["Deux branches : ¬A à gauche, ¬B à droite","Même branche : ¬A puis ¬B en dessous","Deux branches : A à gauche, B à droite","Même branche : A puis B en dessous"],
+ answer:1,explanation:"Par De Morgan : ¬(A∨B) = (¬A) ∧ (¬B). C'est une <b>conjonction</b>, donc on reste sur la <b>même branche</b> : ¬A puis ¬B en dessous."},
+
+{id:8,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>A → B</code> dans un arbre de Beth ?",
  opts:["Branche unique : A puis B","Deux branches : ¬A à gauche, B à droite","Deux branches : A à gauche, ¬B à droite","Branche unique : ¬A puis ¬B"],
- answer:1,explanation:"A → B eq ¬A ∨ B. C'est une disjonction, donc <b>deux branches</b> : ¬A et B."},
+ answer:1,explanation:"A → B est équivalent à (¬A) ∨ B. C'est une <b>disjonction</b>, donc on fait un <b>branchement</b> : branche ¬A et branche B."},
 
-{id:4,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>¬(A → B)</code> ?",
- opts:["Deux branches : A et ¬B","Branche unique : A puis ¬B","Branche unique : ¬A puis B","Deux branches : ¬A et B"],
- answer:1,explanation:"¬(A→B) eq A ∧ ¬B. C'est une conjonction → <b>même branche</b> : A en haut, ¬B en dessous."},
+{id:9,type:"mcq",diff:"easy",text:"Comment décompose-t-on <code>¬(A → B)</code> dans un arbre de Beth ?",
+ opts:["Deux branches : A et ¬B","Branche unique : A puis ¬B en dessous","Branche unique : ¬A puis B","Deux branches : ¬A et B"],
+ answer:1,explanation:"¬(A→B) est équivalent à A ∧ (¬B). C'est une <b>conjonction</b> → <b>même branche</b> : A en haut, ¬B en dessous."},
 
-{id:5,type:"mcq",diff:"medium",text:"Une <b>branche fermée</b> dans un arbre de Beth est une branche qui :",
- opts:["Ne contient que des atomes","Contient une variable p ET sa négation ¬p","A été complètement développée","Correspond à une tautologie"],
- answer:1,explanation:"Une branche est <b>fermée</b> (marquée ✗) si elle contient à la fois une variable et sa négation. C'est contradictoire → cette branche ne peut pas satisfaire la formule."},
+{id:10,type:"mcq",diff:"medium",text:"La décomposition de <code>A ⟷ B</code> dans un arbre de Beth donne :",
+ opts:["Branche unique : A puis B","Deux branches : (A, B) à gauche et (¬A, ¬B) à droite","Deux branches : A à gauche, B à droite","Quatre branches séparées"],
+ answer:1,explanation:"A⟷B est équivalent à (A→B) ∧ (B→A) = (¬A∨B) ∧ (¬B∨A) = (A∧B) ∨ (¬A∧¬B). C'est un ∨ de deux conjonctions. <b>Branche gauche</b> : A puis B (même branche). <b>Branche droite</b> : ¬A puis ¬B (même branche)."},
 
-{id:6,type:"mcq",diff:"medium",text:"Un <b>arbre fermé</b> (toutes les branches fermées) signifie que la formule d'origine est :",
- opts:["Une tautologie","Satisfaisable","Insatisfaisable (contradiction)","Équivalente à ⊤"],
- answer:2,explanation:"Si toutes les branches sont fermées, aucune distribution ne peut satisfaire la formule. Elle est <b>insatisfaisable</b>."},
+{id:11,type:"mcq",diff:"medium",text:"La décomposition de <code>¬(A ⟷ B)</code> dans un arbre de Beth donne :",
+ opts:["Branche unique : ¬A puis ¬B","Deux branches : (A, ¬B) à gauche et (¬A, B) à droite","Deux branches : (A, B) à gauche et (¬A, ¬B) à droite","Quatre branches"],
+ answer:1,explanation:"¬(A⟷B) = ¬((¬A∨B) ∧ (¬B∨A)) = (¬(¬A∨B)) ∨ (¬(¬B∨A)) = (A∧¬B) ∨ (B∧¬A). Donc <b>branche gauche</b> : A puis ¬B, <b>branche droite</b> : ¬A puis B."},
 
-{id:7,type:"mcq",diff:"medium",text:"Pour montrer que F est une <b>tautologie</b> par arbre de Beth, on construit l'arbre de :",
- opts:["F elle-même, et on vérifie que toutes les branches sont ouvertes","¬F, et on vérifie que l'arbre est fermé","F ∧ ¬F","F → F"],
- answer:1,explanation:"Si l'arbre de ¬F est fermé → ¬F est insatisfaisable → F est toujours vraie → F est une <b>tautologie</b>."},
+{id:12,type:"mcq",diff:"medium",text:"Quel est le principe général pour déterminer si une décomposition est « même branche » ou « branchement » ?",
+ opts:["Les formules avec ∧ ou issue de ∧ (¬∨, ¬→) → même branche ; les formules avec ∨ ou issue de ∨ (¬∧, →) → branchement","Toutes les négations donnent un branchement","Les connecteurs binaires donnent toujours un branchement","On choisit arbitrairement"],
+ answer:0,explanation:"Règle mnémotechnique : le <b>∧ et ses dérivés</b> (¬(A∨B), ¬(A→B)) → même branche (non-branching). Le <b>∨ et ses dérivés</b> (¬(A∧B), A→B) → branchement (branching)."},
 
-{id:8,type:"mcq",diff:"medium",text:"La décomposition de <code>A ⟷ B</code> dans un arbre de Beth donne :",
- opts:["Branche unique : A puis B","Deux branches : (A,B) à gauche et (¬A,¬B) à droite","Deux branches : A à gauche, B à droite","Quatre branches"],
- answer:1,explanation:"A⟷B eq (A∧B) ∨ (¬A∧¬B). C'est un ∨ de deux conjonctions. Branche gauche : A puis B. Branche droite : ¬A puis ¬B."},
+// ===== PARTIE 3 : Processus inductif et feuilles =====
+{id:13,type:"mcq",diff:"easy",text:"Dans un arbre de Beth, quand arrête-t-on de décomposer une sous-formule ?",
+ opts:["Quand on a atteint 10 niveaux de profondeur","Quand la sous-formule est un atome (variable propositionnelle) ou sa négation","Quand toutes les branches sont fermées","Quand on trouve une tautologie"],
+ answer:1,explanation:"De façon <b>inductive</b>, on décompose les sous-formules obtenues de la même manière. Lorsqu'une sous-formule est un <b>atome</b> (variable propositionnelle) ou <b>sa négation</b>, c'est qu'on a atteint une <b>feuille</b> de l'arbre."},
 
-{id:9,type:"mcq",diff:"medium",text:"Pour vérifier si ∑ = {H₁, H₂} permet de déduire C, on construit l'arbre de Beth de :",
- opts:["H₁ ∧ H₂ ∧ C","H₁ ∧ H₂ ∧ ¬C","C → (H₁ ∧ H₂)","¬H₁ ∨ ¬H₂ ∨ C"],
- answer:1,explanation:"On met les hypothèses et la <b>négation de la conclusion</b> dans le tronc : {H₁, H₂, ¬C}. Si l'arbre est fermé → ∑ ∪ {¬C} est inconsistant → la déduction est légitime."},
+{id:14,type:"mcq",diff:"medium",text:"Lorsqu'on traite une formule dans un arbre qui a déjà plusieurs branches, où écrit-on les sous-formules ?",
+ opts:["Uniquement sur la branche la plus à gauche","Uniquement à l'extrémité de la branche directement en dessous","À l'extrémité de TOUTES les branches ouvertes qui passent par la formule considérée","On crée de nouvelles branches pour chaque sous-formule"],
+ answer:2,explanation:"Lorsqu'on traite une formule, on écrit les sous-formules auxquelles elle donne naissance à l'extrémité de <b>toutes les branches ouvertes</b> qui passent par la formule considérée. C'est une règle cruciale pour construire l'arbre correctement."},
 
-{id:10,type:"mcq",diff:"medium",text:"Si l'arbre de Beth de ∑ ∪ {¬C} possède une branche ouverte, alors :",
- opts:["La déduction ∑ ⊨ C est légitime","La déduction ∑ ⊨ C n'est PAS légitime","C est une tautologie","∑ est inconsistant"],
- answer:1,explanation:"Branche ouverte → il existe une distribution satisfaisant ∑ et ¬C → on peut satisfaire les hypothèses sans que C soit vrai → la déduction <b>n'est pas légitime</b>."},
+// ===== PARTIE 4 : Exemple détaillé — arbre de F =====
+{id:15,type:"mcq",diff:"medium",text:"Soit F = ((¬a ∨ b) ∧ c) → (a ∧ ¬b). Le premier pas de la décomposition est :",
+ opts:["Décomposer (¬a ∨ b)","Décomposer le → : branche gauche ¬((¬a∨b)∧c) et branche droite (a∧¬b)","Décomposer c","Mettre F dans la FND"],
+ answer:1,explanation:"F est une <b>implication</b> A→B avec A = (¬a∨b)∧c et B = a∧¬b. On décompose d'abord le connecteur principal → : <b>branche gauche</b> ¬((¬a∨b)∧c) et <b>branche droite</b> (a∧¬b)."},
 
-{id:11,type:"mcq",diff:"hard",text:"Pour F = ((¬a∨b) ∧ c) → (a ∧ ¬b), l'arbre de Beth de F donne 3 branches. La FND simplifiée est :",
+{id:16,type:"mcq",diff:"medium",text:"Si l'on rend vrais tous les atomes d'une branche ouverte d'un arbre de Beth, que se passe-t-il ?",
+ opts:["On obtient une contradiction","On rend vraies toutes les formules de cette branche, donc la formule d'origine","On ferme la branche","Rien de particulier"],
+ answer:1,explanation:"Si l'on rend vrais tous les atomes d'une branche, on rend vraies <b>toutes les formules de cette branche</b>, donc la <b>formule d'origine</b>. C'est la propriété fondamentale qui permet de lire les distributions satisfaisantes."},
+
+{id:17,type:"mcq",diff:"hard",text:"Pour F = ((¬a∨b) ∧ c) → (a ∧ ¬b), l'arbre de Beth de F donne 3 branches mais 2 ont les mêmes atomes. La FND simplifiée est :",
  opts:["(a ∧ ¬b) ∨ ¬c","a ∧ ¬b ∧ ¬c","(¬a ∨ ¬b) ∧ ¬c","c → (a ∧ ¬b)"],
- answer:0,explanation:"Les 3 branches donnent les atomes : branche 1 (a,¬b), branche 2 (¬c via ¬(¬a∨b)), branche 3 (a,¬b via a∧¬b). Deux branches identiques → FND = (a∧¬b) ∨ ¬c."},
+ answer:0,explanation:"L'arbre de F a 3 branches : branche gauche issue de ¬((¬a∨b)∧c) donne ¬c (branche 1) ou ¬(¬a∨b) qui mène à a et ¬b (branche 2). La branche droite (a∧¬b) donne aussi a et ¬b (branche 3). Branches 2 et 3 identiques → <b>FND = (a∧¬b) ∨ ¬c</b>."},
 
-{id:12,type:"mcq",diff:"hard",text:"Si ∑ est <b>inconsistant</b>, alors pour toute formule C :",
- opts:["∑ ⊨ C n'est jamais légitime","∑ ⊨ C est toujours légitime","Cela dépend de C","∑ ⊨ C seulement si C est une tautologie"],
- answer:1,explanation:"D'un ensemble inconsistant, on peut déduire <b>n'importe quoi</b>. L'arbre de ∑ ∪ {¬C} sera toujours fermé puisque ∑ seul est déjà inconsistant."},
+// ===== PARTIE 5 : Arbre de ¬F → FNC =====
+{id:18,type:"mcq",diff:"medium",text:"Pour obtenir une FNC de F par la méthode de Beth, on construit l'arbre de :",
+ opts:["F directement","¬F, puis on nie la FND obtenue","F ∧ ¬F","F ∨ ¬F"],
+ answer:1,explanation:"On construit l'arbre de <b>¬F</b>, ce qui donne la FND de ¬F (chaque branche ouverte = un terme conjonctif). Puis on <b>nie cette FND</b> et on applique De Morgan pour obtenir une FNC de F."},
 
-{id:13,type:"mcq",diff:"hard",text:"Le théorème de la déduction dit que <code>∑ ∪ {H} ⊨ C</code> si et seulement si :",
+{id:19,type:"mcq",diff:"hard",text:"Pour F = ((¬a∨b) ∧ c) → (a ∧ ¬b), l'arbre de ¬F donne deux branches ouvertes avec les atomes (c, ¬a) et (c, b). La FND de ¬F est :",
+ opts:["(c ∧ ¬a) ∨ (c ∧ b)","(¬c ∨ a) ∧ (¬c ∨ ¬b)","c ∧ (¬a ∨ b)","¬c ∧ a ∧ ¬b"],
+ answer:0,explanation:"¬F = ¬(((¬a∨b)∧c) → (a∧¬b)) = ((¬a∨b)∧c) ∧ ¬(a∧¬b). L'arbre donne deux branches : branche gauche (c, ¬a) et branche droite (c, b). Donc la <b>FND de ¬F = (c∧¬a) ∨ (c∧b)</b>."},
+
+{id:20,type:"mcq",diff:"hard",text:"Si la FND de ¬F = (c ∧ ¬a) ∨ (c ∧ b), alors la FNC de F est :",
+ opts:["(¬c ∨ a) ∧ (¬c ∨ ¬b)","(c ∧ ¬a) ∧ (c ∧ b)","(¬c ∧ a) ∨ (¬c ∧ ¬b)","(c ∨ ¬a) ∧ (c ∨ b)"],
+ answer:0,explanation:"F = ¬(¬F) = ¬((c∧¬a) ∨ (c∧b)). Par De Morgan : = ¬(c∧¬a) ∧ ¬(c∧b) = <b>(¬c∨a) ∧ (¬c∨¬b)</b>. C'est bien une FNC (conjonction de disjonctions)."},
+
+// ===== PARTIE 6 : Branches fermées et arbres fermés =====
+{id:21,type:"mcq",diff:"easy",text:"Une <b>branche fermée</b> dans un arbre de Beth est une branche qui :",
+ opts:["Ne contient que des atomes","Contient une variable propositionnelle p ET sa négation ¬p","A été complètement développée sans contradiction","Correspond à une tautologie"],
+ answer:1,explanation:"Si une branche comporte une <b>variable propositionnelle et sa négation</b>, on dit que l'on a une <b>branche fermée</b> (marquée ✗). C'est contradictoire : on ne peut pas satisfaire à la fois p et ¬p."},
+
+{id:22,type:"mcq",diff:"easy",text:"Un <b>arbre fermé</b> (toutes les branches fermées) signifie que :",
+ opts:["La formule est une tautologie","La formule est satisfaisable","La formule d'origine n'est pas satisfaisable","La formule est équivalente à ⊤"],
+ answer:2,explanation:"Si <b>toutes les branches</b> d'un arbre sont fermées, on a un <b>arbre fermé</b>. Dans ce cas, la formule d'origine <b>n'est pas satisfaisable</b> (insatisfaisable) : aucune distribution de vérité ne peut la rendre vraie."},
+
+{id:23,type:"mcq",diff:"medium",text:"Pour montrer que F est une <b>tautologie</b> par arbre de Beth, on construit l'arbre de :",
+ opts:["F elle-même, et on vérifie que toutes les branches sont ouvertes","¬F, et on vérifie que l'arbre est fermé","F ∧ ¬F","F → F"],
+ answer:1,explanation:"Pour montrer qu'une formule F est une tautologie, il suffit de montrer que <b>¬F n'est pas satisfaisable</b>, c'est-à-dire que l'arbre de <b>¬F est fermé</b>. Si ¬F est insatisfaisable, alors F est toujours vraie."},
+
+{id:24,type:"mcq",diff:"medium",text:"Dès qu'une branche est fermée dans un arbre, que fait-on ?",
+ opts:["On continue à développer les sous-formules sous cette branche","On n'a pas besoin de reproduire dans sa suite d'éventuelles sous-formules","On supprime toute la branche","On recommence l'arbre"],
+ answer:1,explanation:"Dès qu'une branche est fermée, on n'a <b>pas besoin de reproduire</b> dans sa suite d'éventuelles sous-formules à développer. C'est une optimisation importante de la construction de l'arbre."},
+
+// ===== PARTIE 7 : Conséquence logique =====
+{id:25,type:"mcq",diff:"medium",text:"Un ensemble de formules ∑ est dit <b>satisfaisable</b> si :",
+ opts:["Toutes les formules de ∑ sont des tautologies","Il existe une distribution δ telle que ∀F ∈ ∑, δ(F) = 1","Pour toute distribution δ, au moins une formule de ∑ est vraie","∑ ne contient qu'une seule formule"],
+ answer:1,explanation:"Un ensemble de formules ∑ est dit <b>satisfaisable</b> s'il existe une distribution de vérité δ qui satisfait <b>toutes</b> les formules de ∑ à la fois : ∃δ, ∀F ∈ ∑, δ(F) = 1."},
+
+{id:26,type:"mcq",diff:"medium",text:"La notation <code>∑ ⊨ C</code> signifie que :",
+ opts:["C est une tautologie","∑ implique C syntaxiquement","Toute distribution satisfaisant toutes les formules de ∑ satisfait aussi C","C appartient à ∑"],
+ answer:2,explanation:"∑ ⊨ C signifie que C est une <b>conséquence logique</b> de ∑ : toute distribution satisfaisant toutes les formules de ∑ satisfait aussi C. Formellement : ∀δ, (∀F ∈ ∑, δ(F) = 1) ⟹ δ(C) = 1. ∑ est l'ensemble d'hypothèses, C est la conclusion."},
+
+// ===== PARTIE 8 : Arbres de Beth et consistance =====
+{id:27,type:"mcq",diff:"medium",text:"Pour vérifier la consistance d'un ensemble de formules {H₁, H₂, …, Hₙ}, on construit un arbre de Beth dont le tronc contient :",
+ opts:["H₁ ∨ H₂ ∨ … ∨ Hₙ","Les formules H₁, H₂, …, Hₙ comme formules initiales du tronc","¬H₁, ¬H₂, …, ¬Hₙ","(H₁ → H₂) ∧ (H₂ → H₃) ∧ …"],
+ answer:1,explanation:"On associe à l'ensemble {H₁, H₂, …, Hₙ} un arbre dont ces formules sont les <b>formules initiales</b> : elles forment le <b>tronc</b> de l'arbre. Puis on développe l'arbre normalement."},
+
+{id:28,type:"mcq",diff:"medium",text:"Si l'arbre de Beth d'un ensemble de formules possède au moins une branche ouverte, l'ensemble est :",
+ opts:["Inconsistant","Consistant (satisfaisable)","Une tautologie","Vide"],
+ answer:1,explanation:"S'il existe au moins une <b>branche ouverte</b>, alors il existe au moins une distribution qui satisfait toutes les formules H₁, H₂, …, Hₙ. L'ensemble de formules est dit <b>consistant</b> ou <b>satisfaisable</b>."},
+
+{id:29,type:"mcq",diff:"medium",text:"Si toutes les branches de l'arbre d'un ensemble de formules sont fermées, l'ensemble est :",
+ opts:["Consistant","Inconsistant (insatisfaisable)","Tautologique","Indéterminé"],
+ answer:1,explanation:"Si toutes les branches sont fermées, les formules H₁, H₂, …, Hₙ <b>ne peuvent pas être simultanément satisfaites</b>. L'ensemble de formules est dit <b>inconsistant</b> ou <b>insatisfaisable</b>."},
+
+// ===== PARTIE 9 : Légitimité d'une déduction =====
+{id:30,type:"mcq",diff:"medium",text:"Pour vérifier si ∑ ⊨ C (déduction légitime), on construit l'arbre de Beth de :",
+ opts:["∑ ∪ {C}","∑ ∪ {¬C}","¬∑ ∪ {C}","∑ → C"],
+ answer:1,explanation:"On vérifie si l'ensemble <b>∑ ∪ {¬C}</b> est consistant ou non. On place dans le tronc les hypothèses de ∑ et la <b>négation de la conclusion</b> ¬C, puis on développe l'arbre."},
+
+{id:31,type:"mcq",diff:"medium",text:"Si l'arbre de ∑ ∪ {¬C} est <b>fermé</b> (toutes branches fermées), alors :",
+ opts:["La déduction ∑ ⊨ C n'est pas légitime","Il existe un contre-exemple","La déduction ∑ ⊨ C est légitime","∑ est inconsistant"],
+ answer:2,explanation:"Si l'arbre est <b>inconsistant</b> (fermé), il n'existe aucune distribution de vérité satisfaisant les hypothèses ∑ et ¬C. Donc toute distribution qui satisfait ∑ satisfait aussi C. La <b>déduction est légitime</b>."},
+
+{id:32,type:"mcq",diff:"medium",text:"Si l'arbre de ∑ ∪ {¬C} possède une <b>branche ouverte</b>, alors :",
+ opts:["La déduction ∑ ⊨ C est légitime","La déduction ∑ ⊨ C n'est PAS légitime","C est une tautologie","∑ est inconsistant"],
+ answer:1,explanation:"Si l'arbre est <b>consistant</b> (branche ouverte), il existe une distribution qui satisfait les hypothèses ∑ <b>et</b> ¬C. Autrement dit, on peut satisfaire les hypothèses sans que C soit vrai. La <b>déduction n'est pas légitime</b>."},
+
+// ===== PARTIE 10 : Exemples de déduction =====
+{id:33,type:"mcq",diff:"medium",text:"Peut-on déduire <code>p</code> à partir de <code>(p ∧ q)</code> ? (∑ = {p∧q}, C = p)",
+ opts:["Non, car l'arbre a une branche ouverte","Oui, car l'arbre de {p∧q, ¬p} est fermé","Cela dépend de la valeur de q","On ne peut pas le vérifier par arbre de Beth"],
+ answer:1,explanation:"Tronc : p∧q, ¬p. On décompose p∧q (conjonction → même branche) : p et q. La branche contient p <b>et</b> ¬p → <b>branche fermée</b>. L'arbre est fermé → la déduction {p∧q} ⊨ p est <b>légitime</b>."},
+
+{id:34,type:"mcq",diff:"medium",text:"Peut-on déduire <code>(p ∨ q)</code> à partir de <code>p</code> ? (∑ = {p}, C = p∨q)",
+ opts:["Non, c'est impossible","Oui, car l'arbre de {p, ¬(p∨q)} est fermé","Seulement si q est vrai","Seulement si p est faux"],
+ answer:1,explanation:"Tronc : p, ¬(p∨q). On décompose ¬(p∨q) par De Morgan (conjonction → même branche) : ¬p et ¬q. La branche contient p <b>et</b> ¬p → <b>branche fermée</b>. L'arbre est fermé → la déduction {p} ⊨ (p∨q) est <b>légitime</b>."},
+
+{id:35,type:"mcq",diff:"hard",text:"∑ = {p, q → (p → r)}. Peut-on déduire C = q → r ?",
+ opts:["Non, l'arbre a une branche ouverte","Oui, l'arbre de ∑ ∪ {¬(q→r)} est fermé","Cela dépend de la valeur de r","∑ est inconsistant"],
+ answer:1,explanation:"Tronc : p, q→(p→r), ¬(q→r). On décompose ¬(q→r) = q∧¬r (même branche) : q, ¬r. On décompose q→(p→r) (branchement) : branche ¬q ou branche (p→r). Branche ¬q : contient q et ¬q → <b>fermée</b>. Branche (p→r) : branchement ¬p ou r. Branche ¬p : contient p et ¬p → <b>fermée</b>. Branche r : contient r et ¬r → <b>fermée</b>. Toutes branches fermées → la déduction est <b>légitime</b>."},
+
+{id:36,type:"mcq",diff:"hard",text:"∑ = {(p∧q)→r, r→s, q∧¬s}. Peut-on déduire C = ¬p ?",
+ opts:["Oui, l'arbre de ∑ ∪ {p} est fermé","Non, l'arbre de ∑ ∪ {p} a une branche ouverte","Non, ∑ est inconsistant","Oui, mais seulement si s = 0"],
+ answer:0,explanation:"Tronc : (p∧q)→r, r→s, q∧¬s, ¬(¬p) = p. Décomposition de q∧¬s : q, ¬s (même branche). Décomposition de (p∧q)→r : branche ¬(p∧q) ou branche r. Branche r : r→s donne ¬r ou s ; ¬r contient r et ¬r → fermée ; s contient s et ¬s → fermée. Branche ¬(p∧q) : branche ¬p (contient p et ¬p → fermée) ou branche ¬q (contient q et ¬q → fermée). <b>Toutes les branches sont fermées</b> → ∑ ⊨ ¬p est <b>légitime</b>."},
+
+// ===== PARTIE 11 : Astuces pratiques =====
+{id:37,type:"mcq",diff:"medium",text:"Dans quel ordre vaut-il mieux traiter les formules du tronc ?",
+ opts:["Toujours de haut en bas","En commençant de préférence par les conjonctions","En commençant par les disjonctions","L'ordre n'a aucune influence sur l'arbre final"],
+ answer:1,explanation:"On peut traiter les formules du tronc dans un <b>ordre quelconque</b>, mais il est conseillé de <b>commencer par les conjonctions</b>. Celles-ci ne créent pas de branchement, ce qui limite le nombre de branches à développer par la suite."},
+
+{id:38,type:"mcq",diff:"easy",text:"Pourquoi est-il conseillé de <b>marquer</b> les formules déjà traitées dans un arbre de Beth ?",
+ opts:["Pour rendre l'arbre plus joli","Pour ne pas traiter une formule deux fois","Pour savoir quelles formules sont des tautologies","Pour identifier les branches fermées"],
+ answer:1,explanation:"Il faut <b>marquer une formule traitée</b> (souvent avec un ✓ ou en la barrant) pour ne pas la <b>traiter deux fois</b>. Il est aussi recommandé de numéroter les formules et leurs enfants pour suivre la construction."},
+
+// ===== PARTIE 12 : Propriétés de la déduction =====
+{id:39,type:"mcq",diff:"medium",text:"Si ∑ est un ensemble de formules <b>inconsistant</b>, alors pour toute formule C :",
+ opts:["∑ ⊨ C n'est jamais légitime","∑ ⊨ C est toujours légitime, quelle que soit C","Cela dépend de la formule C","∑ ⊨ C seulement si C est une tautologie"],
+ answer:1,explanation:"D'un ensemble de formules inconsistant, on peut déduire <b>n'importe quoi</b>. L'arbre de ∑ ∪ {¬C} sera toujours fermé puisque ∑ seul est déjà inconsistant. Exemple classique : l'ensemble des proverbes est inconsistant (« tel père, tel fils » vs « à père avare, enfant prodigue »), donc on peut en déduire n'importe quel énoncé."},
+
+{id:40,type:"mcq",diff:"medium",text:"Si C est une <b>tautologie</b>, alors :",
+ opts:["C est déductible uniquement de l'ensemble vide","C est déductible de tout ensemble de formules ∑","C n'est déductible d'aucun ensemble","C est déductible seulement si ∑ est consistant"],
+ answer:1,explanation:"Si C est une tautologie, C est déductible de <b>tout ensemble</b> de formules ∑. En particulier, une tautologie est déductible de l'ensemble vide ∅. On note ⊨ F (sans ∑) pour dire « F est tautologique », c'est une abréviation de ∅ ⊨ F."},
+
+{id:41,type:"mcq",diff:"medium",text:"Si ∑ ⊂ ∑' et ∑ ⊨ C, alors :",
+ opts:["∑' ⊨ C est aussi légitime","∑' ⊨ C n'est pas forcément légitime","Il faut revérifier avec ∑'","C devient une tautologie"],
+ answer:0,explanation:"C'est la propriété de <b>monotonie</b> de la déduction : si une déduction est légitime, on peut toujours <b>ajouter des hypothèses</b>, la déduction reste légitime. Si ∑ ⊂ ∑' et ∑ ⊨ C, alors ∑' ⊨ C."},
+
+{id:42,type:"mcq",diff:"medium",text:"La notation <code>⊨ F</code> (sans ensemble ∑) signifie :",
+ opts:["F est satisfaisable","F est insatisfaisable","F est une tautologie (abréviation de ∅ ⊨ F)","F est une contradiction"],
+ answer:2,explanation:"Le symbole ⊨ est utilisé de deux façons : <b>∑ ⊨ C</b> pour dire « C est déductible de ∑ », et <b>⊨ F</b> pour dire « F est tautologique ». La deuxième notation est une abréviation de <b>∅ ⊨ F</b> (F est déductible de l'ensemble vide)."},
+
+// ===== PARTIE 13 : Théorème de la déduction =====
+{id:43,type:"mcq",diff:"hard",text:"Le théorème de la déduction dit que <code>∑ ∪ {H} ⊨ C</code> si et seulement si :",
  opts:["∑ ⊨ C ∧ H","∑ ⊨ H → C","∑ ⊨ ¬H ∨ ¬C","H ⊨ ∑ → C"],
- answer:1,explanation:"Théorème de la déduction : ∑ ∪ {H} ⊨ C <b>ssi</b> ∑ ⊨ (H → C). On peut « déplacer » une hypothèse dans l'implication de la conclusion."},
+ answer:1,explanation:"<b>Théorème de la déduction</b> : ∑ ∪ {H} ⊨ C <b>ssi</b> ∑ ⊨ (H → C). On peut « déplacer » une hypothèse H du côté gauche vers une implication dans la conclusion. C'est le lien fondamental entre le connecteur → et la déduction ⊨."},
 
-{id:14,type:"mcq",diff:"hard",text:"Soit ∑ = {(p∧q)→r, r→s, q∧¬s}. Peut-on déduire C = ¬p ?",
- opts:["Oui, car l'arbre de ∑ ∪ {p} est fermé","Non, il existe un contre-exemple","Non, ∑ est inconsistant","Oui, mais seulement si s=0"],
- answer:0,explanation:"Non, on ne peut pas déduire ¬p. L'arbre de ∑ ∪ {p} (tronc : les hypothèses + p) possède une branche ouverte avec (p,q,r,s)=(0,1,0,0), donc la déduction n'est pas légitime. En fait l'arbre de ∑ ∪ {¬(¬p)} = ∑ ∪ {p} a une branche ouverte."}
+{id:44,type:"mcq",diff:"hard",text:"Par le théorème de la déduction, si ∑ = ∅, alors <code>H ⊨ C</code> si et seulement si :",
+ opts:["⊨ (H ∧ C)","⊨ (H → C)","⊨ (C → H)","H est une tautologie"],
+ answer:1,explanation:"Pour ∑ = ∅, le théorème de la déduction donne : H ⊨ C ssi <b>⊨ (H → C)</b>, c'est-à-dire H → C est une <b>tautologie</b>. C'est le lien direct entre le connecteur → et la relation de déduction."},
+
+{id:45,type:"mcq",diff:"hard",text:"Il est équivalent d'écrire <code>{H₁, H₂, …, Hₙ} ⊨ C</code> et :",
+ opts:["H₁ ∨ H₂ ∨ … ∨ Hₙ ⊨ C","H₁ ∧ H₂ ∧ … ∧ Hₙ ⊨ C","H₁ → (H₂ → (… → C))","¬H₁ ∧ ¬H₂ ∧ … ∧ ¬Hₙ ⊨ C"],
+ answer:1,explanation:"Un ensemble d'hypothèses {H₁, H₂, …, Hₙ} peut être remplacé par la <b>conjonction</b> de ses éléments : {H₁, H₂, …, Hₙ} ⊨ C est équivalent à <b>H₁ ∧ H₂ ∧ … ∧ Hₙ ⊨ C</b>."},
+
+// ===== PARTIE 14 : Questions de synthèse =====
+{id:46,type:"mcq",diff:"hard",text:"L'arbre de Beth de F fournit directement :",
+ opts:["La FNC de F","La FND de F (chaque branche ouverte = un terme conjonctif)","La table de vérité complète","Le circuit logique minimal"],
+ answer:1,explanation:"Chaque <b>branche ouverte</b> de l'arbre de F correspond à un <b>terme conjonctif</b> (conjonction des atomes de la branche). L'ensemble des branches ouvertes donne directement la <b>FND</b> de F. Cette FND est souvent plus simplifiée que celle obtenue par la méthode des tables de vérité."},
+
+{id:47,type:"mcq",diff:"hard",text:"Pour obtenir la FNC de F, on peut :",
+ opts:["Lire directement l'arbre de F","Construire l'arbre de ¬F, obtenir la FND de ¬F, puis nier avec De Morgan","Utiliser uniquement la table de vérité","Ce n'est pas possible avec les arbres de Beth"],
+ answer:1,explanation:"On construit l'arbre de <b>¬F</b> pour obtenir la FND de ¬F. Puis : F = ¬(¬F) = ¬(FND de ¬F). En appliquant <b>De Morgan</b> à cette négation, on obtient une <b>FNC de F</b> (conjonction de disjonctions)."},
+
+{id:48,type:"mcq",diff:"hard",text:"Quelle est la différence principale entre un arbre de Beth et une table de vérité ?",
+ opts:["L'arbre de Beth est toujours plus lent","L'arbre de Beth donne souvent des FND/FNC simplifiées sans énumérer toutes les 2ⁿ combinaisons","L'arbre de Beth ne fonctionne qu'avec 2 variables","Il n'y a aucune différence"],
+ answer:1,explanation:"Les arbres de Beth peuvent <b>remplacer</b> les tables de vérité et les tableaux de Karnaugh. Leur avantage principal est de donner des <b>FND/FNC souvent simplifiées</b> par rapport à la méthode des tables de vérité, sans avoir à énumérer les 2ⁿ combinaisons possibles."}
 ];
 let state;function loadState(){try{state=JSON.parse(localStorage.getItem(STATE_KEY))||{}}catch(e){state={}}if(!state.answered)state={answered:{},right:0,wrong:0,errorCounts:{}}}function saveState(){localStorage.setItem(STATE_KEY,JSON.stringify(state))}
 function render(){loadState();const c=document.getElementById("qc");c.innerHTML="";let done=0;Q.forEach((q)=>{const ans=state.answered[q.id];const isDone=ans!==undefined;if(isDone)done++;const ec=state.errorCounts[q.id]||0;const div=document.createElement("div");div.className="qcard"+(isDone?(ans===true?" correct":" wrong"):"");let inner=`<div class="qhdr"><span class="qnum">Q${q.id}</span><span class="qdiff ${q.diff}">${q.diff}</span>${ec>0?`<span class="errcnt">↻ ${ec}</span>`:""}</div><div class="qtext">${q.text}</div>`;if(q.type==="mcq"){inner+=`<div class="opts">`;q.opts.forEach((o,oi)=>{let cls="opt";if(isDone){cls+=" locked";if(oi===q.answer)cls+=" c-right";else if(ans===false&&state.answered[q.id+"_sel"]===oi)cls+=" c-wrong";}inner+=`<div class="${cls}" onclick="pickMCQ(${q.id},${oi})"><div class="marker">${isDone?(oi===q.answer?"✓":(state.answered[q.id+"_sel"]===oi?"✗":"")):"ABCD"[oi]}</div><span>${o}</span></div>`;});inner+="</div>";}else{const val=isDone?(state.answered[q.id+"_val"]||""):"";inner+=`<div class="input-row"><input id="inp${q.id}" value="${val}" placeholder="Réponse..." ${isDone?"disabled":""} class="${isDone?(ans?"c-right":"c-wrong"):""}" onkeydown="if(event.key==='Enter')submitInput(${q.id})"><button class="submit-btn" onclick="submitInput(${q.id})" ${isDone?"disabled":""}>Vérifier</button></div>`;}inner+=`<div class="expl ${isDone?"show":""} ${isDone?(ans?"right":"wrong"):""}">${isDone?(ans?"✅ Correct — ":"❌ Incorrect — ")+q.explanation:""}</div>`;if(isDone)inner+=`<div class="rstq"><button onclick="resetQ(${q.id})">↻ Refaire</button></div>`;div.innerHTML=inner;c.appendChild(div);});updateScore(done);}
